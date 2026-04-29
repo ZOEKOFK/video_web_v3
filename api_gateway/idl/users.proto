@@ -1,0 +1,116 @@
+syntax = "proto3";
+
+package users;
+
+option go_package = "users";
+
+import "idl/common.proto";
+import "idl/api.proto";
+
+
+// 用户信息
+message User {
+  int64 id = 1;
+  string username = 2;
+  string avatar_url = 4;
+  string nickname = 5;
+  string created_at = 6;
+  string updated_at = 7;
+}
+message Token {
+  string access_expire = 1;
+  string access_token = 2;
+  string refresh_expire =3;
+  string refresh_token = 4;
+}
+
+message UserRegisterRequest {
+  string username = 1;
+  string password = 2;
+  string nickname = 3;
+}
+
+message UserRegisterResponse{
+  common.ErrorCode code = 1;
+  string message = 2;
+}
+
+message UserLoginRequest {
+  string username = 1;    // 用户名
+  string password = 2;    // 密码
+  bool remember = 3;      // 记住我
+}
+
+message UserLoginResponse{
+  common.ErrorCode code = 1;
+  string message = 2;
+      Token token_info = 3;
+      User user_info =4;
+}
+
+service UserPublicService {
+  // 注册
+  rpc Register(UserRegisterRequest) returns (UserRegisterResponse) {
+    option (api.post) = "/api/users";
+  }
+  // 登录
+  rpc Login(UserLoginRequest) returns (UserLoginResponse) {
+    option (api.post) = "/api/sessions";
+  }
+}
+message GetUserInfoResponse{
+  common.ErrorCode code = 1;
+  string message = 2;
+    User user_info = 3;
+}
+
+message UploadAvatarRequest {
+  string user_id = 1;    // 用户ID
+  bytes file = 2;        // 文件数据
+}
+
+message UploadAvatarResponse{
+  common.ErrorCode code = 1;
+  string message = 2;
+    User user_info = 3;
+}
+// 用户认证服务
+service UserAuthService {
+  // 获取用户信息
+  rpc GetUserInfo(common.IDRequest) returns (GetUserInfoResponse) {
+    option (api.get) = "/api/users/:user_id";
+  }
+  // 上传头像
+  rpc UploadAvatar(UploadAvatarRequest) returns (UploadAvatarResponse) {
+    option (api.post) = "/api/users/:user_id/avatar";
+  }
+}
+
+message RefreshTokenRequest {
+  string refresh_token = 1;
+  bool remember = 2;
+}
+
+message RefreshTokenResponse{
+  common.ErrorCode code = 1;
+  string message = 2;
+    Token token_info = 3;
+    User user_info = 4;
+}
+
+message LogoutResponse{
+  common.ErrorCode code = 1;
+  string message = 2;
+}
+service SessionService {
+  // 刷新会话
+  rpc RefreshSession(RefreshTokenRequest) returns (RefreshTokenResponse) {
+    option (api.post) = "/api/sessions/refresh";
+  }
+
+  // 登出
+  rpc Logout(RefreshTokenRequest) returns (LogoutResponse) {
+    option (api.delete) = "/api/sessions";
+  }
+}
+
