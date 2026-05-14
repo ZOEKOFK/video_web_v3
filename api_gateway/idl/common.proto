@@ -1,0 +1,108 @@
+syntax = "proto3";
+
+package common;
+option go_package = "/common";
+
+enum ErrorCode {
+  NOTHING = 0;
+  SUCCESS = 1;
+  REQUEST_ERROR = 1000;          // 获取请求失败
+  PARAM_ERROR = 1001;         // 参数错误
+  USER_NOT_LOGIN = 2001;      // 用户未登录
+  USER_EXIST = 2002;          // 用户已存在
+  USER_NOT_EXIST = 2003;      // 用户不存在
+  USER_PASSWORD_ERROR = 2004; // 用户密码错误
+  VIDEO_NOT_EXIST = 3001;     // 视频不存在
+  VIDEO_FORMAT_ERROR = 3002;  // 视频格式错误
+  COMMENT_NOT_EXIST = 4001;   // 评论不存在
+  OPERATION_FORBIDDEN = 5001; // 操作禁止（如删他人评论）
+  PROGRESS_ERROR = 6001;      // 其他错误
+}
+
+// 用户信息
+message User {
+  int64 id = 1;
+  string username = 2;
+  string avatar_url = 4;
+  string nickname = 5;
+  string created_at = 6;
+  string updated_at = 7;
+}
+
+// 视频信息
+message Video {
+  int64 id = 1;
+  string title = 2;
+  string description = 3;
+  string video_url = 4;
+  int32 views = 5;
+  int32 likes = 6;
+  int32 comments = 7;
+  string created_at = 8;
+  string updated_at = 9;
+}
+
+// 评论信息
+message Comment {
+  int64 id = 1;
+  int64 user_id = 2;
+  int64 video_id = 3;
+  int64 parent_id = 4;
+  string content = 5;
+  int64 likes = 6;
+  User user_info = 7;
+  repeated Comment reply_list = 8;
+  string created_at = 9;
+  string updated_at = 10;
+}
+
+// 点赞用户信息
+message LikeUser {
+  int64 user_id = 1;
+  User user_info = 2;
+  string created_at = 3;
+}
+
+// Token 信息
+message Token {
+  string access_expire = 1;
+  string access_token = 2;
+  string refresh_expire =3;
+  string refresh_token = 4;
+}
+
+// 通用数据
+message Data {
+  User user_info = 1;
+  Token token_info = 2;
+  repeated Video video_list = 3;
+  Video video_info = 4;
+  repeated User user_list = 5;
+  Comment comment_info = 6;
+  repeated Comment comment_list = 7;
+  int32 total_count = 8;
+}
+
+// 通用响应
+message CommonResponse {
+  ErrorCode code = 1;
+  string message = 2;
+  Data data = 3;
+}
+
+// 分页请求
+message Pagination {
+  int32 page = 1;
+  int32 page_size = 2;
+}
+
+// ID请求
+message IDRequest {
+  string id = 1;          // ID
+}
+
+// 文件上传请求
+message FileUploadRequest {
+  string file_key = 1;    // 文件键
+  string file_type = 2;    // 文件类型
+}

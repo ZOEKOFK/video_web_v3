@@ -1,0 +1,114 @@
+syntax = "proto3";
+
+package users;
+
+option go_package = "/users";
+
+import "idl/common.proto";
+import "idl/api.proto";
+
+
+
+message UserRegisterRequest {
+  string username = 1;
+  string password = 2;
+  string nickname = 3;
+}
+
+//message UserRegisterResponse{
+//  common.ErrorCode code = 1;
+//  string message = 2;
+//}
+
+message UserLoginRequest {
+  string username = 1;    // 用户名
+  string password = 2;    // 密码
+  bool remember = 3;      // 记住我
+}
+
+//message UserLoginResponse{
+//  common.ErrorCode code = 1;
+//  string message = 2;
+//      Token token_info = 3;
+//      User user_info =4;
+//}
+
+service UserPublicService {
+  // 注册
+  rpc Register(UserRegisterRequest) returns (common.CommonResponse) {
+    option (api.post) = "/api/users";
+  }
+  // 登录
+  rpc Login(UserLoginRequest) returns (common.CommonResponse) {
+    option (api.post) = "/api/sessions";
+  }
+}
+
+
+message UploadAvatarRequest {
+  string user_id = 1;    // 用户ID
+  bytes file = 2;        // 文件数据
+  string file_extension = 3;//文件后缀
+}
+
+
+// 用户认证服务
+service UserAuthService {
+  // 获取用户信息
+  rpc GetUserInfo(common.IDRequest) returns (common.CommonResponse) {
+    option (api.get) = "/api/users/:user_id";
+  }
+  // 上传头像
+  rpc UploadAvatar(UploadAvatarRequest) returns (common.CommonResponse) {
+    option (api.post) = "/api/users/:user_id/avatar";
+  }
+  // 获取 MFA 二维码
+  rpc GetMFACode(GetMFACodeRequest) returns (common.CommonResponse) {
+    option (api.get) = "/api/users/:user_id/mfa/qrcode";
+  }
+  // 绑定 MFA
+  rpc BindMFA(BindMFARequest) returns (common.CommonResponse) {
+    option (api.post) = "/api/users/:user_id/mfa/bind";
+  }
+}
+
+message GetMFACodeRequest {
+  string user_id = 1;
+}
+
+message BindMFARequest {
+  string user_id = 1;
+  string code    = 2;   // TOTP 验证码
+}
+
+//
+message RefreshTokenRequest {
+  string refresh_token = 1;
+  bool remember = 2;
+}
+
+//message RefreshTokenResponse{
+//  common.ErrorCode code = 1;
+//  string message = 2;
+//  message data{
+//    Token token_info = 3;
+//    User user_info = 4;
+//  }
+//}
+
+//message LogoutResponse{
+//  common.ErrorCode code = 1;
+//  string message = 2;
+//}
+service SessionService {
+  // 刷新会话
+  rpc RefreshSession(RefreshTokenRequest) returns (common.CommonResponse) {
+    option (api.post) = "/api/sessions/refresh";
+  }
+
+  // 登出
+  rpc Logout(RefreshTokenRequest) returns (common.CommonResponse) {
+    option (api.delete) = "/api/sessions";
+  }
+}
+
