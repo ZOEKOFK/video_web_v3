@@ -6,7 +6,7 @@ import (
 
 	"github.com/ZOEKOFK/video_web_v3/api_gateway/client"
 	"github.com/ZOEKOFK/video_web_v3/app/pb/common"
-	users "github.com/ZOEKOFK/video_web_v3/app/pb/users"
+	userspb "github.com/ZOEKOFK/video_web_v3/app/pb/users"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )
@@ -14,9 +14,8 @@ import (
 // RefreshSession .
 // @router /api/sessions/refresh [POST]
 func RefreshSession(ctx context.Context, c *app.RequestContext) {
-	var req users.RefreshTokenRequest
+	var req userspb.RefreshTokenRequest
 	err := c.BindJSON(&req)
-	//log.Println(req.RefreshToken)
 	if err != nil {
 		log.Println("[RefreshSession] 绑定请求失败:", err)
 		c.JSON(consts.StatusOK, client.FailResponse("Invalid request", common.ErrorCode_PARAM_ERROR))
@@ -36,7 +35,7 @@ func RefreshSession(ctx context.Context, c *app.RequestContext) {
 // Logout .
 // @router /api/sessions [DELETE]
 func Logout(ctx context.Context, c *app.RequestContext) {
-	var req users.RefreshTokenRequest
+	var req userspb.RefreshTokenRequest
 	if err := c.Bind(&req); err != nil {
 		log.Println("[Logout] 绑定请求失败:", err)
 		c.JSON(consts.StatusOK, client.FailResponse("Invalid request", common.ErrorCode_PARAM_ERROR))

@@ -1,0 +1,42 @@
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+*.txt
+
+# Go workspace
+go.work
+
+# Go vendor
+vendor/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build output
+/bin/
+/dist/
+/build/
+
+# Logs
+*.log
+
+# Environment
+.env
+.env.local
+
+# Database
+*.db
+*.sqlite

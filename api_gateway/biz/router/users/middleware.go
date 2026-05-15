@@ -56,6 +56,19 @@ func _getuserinfoMw() []app.HandlerFunc {
 }
 
 func _uploadavatarMw() []app.HandlerFunc {
+	return []app.HandlerFunc{my_jwt.AuthMiddleware.MiddlewareFunc()}
+}
+
+func _mfaMw() []app.HandlerFunc {
+	return []app.HandlerFunc{my_jwt.AuthMiddleware.MiddlewareFunc()}
+}
+
+func _bindmfaMw() []app.HandlerFunc {
 	// your code...
-	return []app.HandlerFunc{}
+	return nil
+}
+
+func _getmfacodeMw() []app.HandlerFunc {
+	// your code...
+	return nil
 }

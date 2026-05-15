@@ -28,5 +28,10 @@ func Register(r *server.Hertz) {
 		_users.GET("/:user_id", append(_getuserinfoMw(), users.GetUserInfo)...)
 		_user_id := _users.Group("/:user_id", _user_idMw()...)
 		_user_id.POST("/avatar", append(_uploadavatarMw(), users.UploadAvatar)...)
+		{
+			_mfa := _user_id.Group("/mfa", _mfaMw()...)
+			_mfa.POST("/bind", append(_bindmfaMw(), users.BindMFA)...)
+			_mfa.GET("/qrcode", append(_getmfacodeMw(), users.GetMFACode)...)
+		}
 	}
 }

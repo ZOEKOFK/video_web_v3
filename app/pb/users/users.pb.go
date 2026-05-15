@@ -144,8 +144,9 @@ func (x *UserLoginRequest) GetRemember() bool {
 
 type UploadAvatarRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"` // 用户ID
-	File          []byte                 `protobuf:"bytes,2,opt,name=file,proto3" json:"file,omitempty"`                   // 文件数据
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`                      // 用户ID
+	File          []byte                 `protobuf:"bytes,2,opt,name=file,proto3" json:"file,omitempty"`                                        // 文件数据
+	FileExtension string                 `protobuf:"bytes,3,opt,name=file_extension,json=fileExtension,proto3" json:"file_extension,omitempty"` //文件后缀
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -194,6 +195,109 @@ func (x *UploadAvatarRequest) GetFile() []byte {
 	return nil
 }
 
+func (x *UploadAvatarRequest) GetFileExtension() string {
+	if x != nil {
+		return x.FileExtension
+	}
+	return ""
+}
+
+type GetMFACodeRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetMFACodeRequest) Reset() {
+	*x = GetMFACodeRequest{}
+	mi := &file_idl_users_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetMFACodeRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetMFACodeRequest) ProtoMessage() {}
+
+func (x *GetMFACodeRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_idl_users_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetMFACodeRequest.ProtoReflect.Descriptor instead.
+func (*GetMFACodeRequest) Descriptor() ([]byte, []int) {
+	return file_idl_users_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *GetMFACodeRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+type BindMFARequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Code          string                 `protobuf:"bytes,2,opt,name=code,proto3" json:"code,omitempty"` // TOTP 验证码
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BindMFARequest) Reset() {
+	*x = BindMFARequest{}
+	mi := &file_idl_users_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BindMFARequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BindMFARequest) ProtoMessage() {}
+
+func (x *BindMFARequest) ProtoReflect() protoreflect.Message {
+	mi := &file_idl_users_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BindMFARequest.ProtoReflect.Descriptor instead.
+func (*BindMFARequest) Descriptor() ([]byte, []int) {
+	return file_idl_users_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *BindMFARequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *BindMFARequest) GetCode() string {
+	if x != nil {
+		return x.Code
+	}
+	return ""
+}
+
 type RefreshTokenRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	RefreshToken  string                 `protobuf:"bytes,1,opt,name=refresh_token,json=refreshToken,proto3" json:"refresh_token,omitempty"`
@@ -204,7 +308,7 @@ type RefreshTokenRequest struct {
 
 func (x *RefreshTokenRequest) Reset() {
 	*x = RefreshTokenRequest{}
-	mi := &file_idl_users_proto_msgTypes[3]
+	mi := &file_idl_users_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -216,7 +320,7 @@ func (x *RefreshTokenRequest) String() string {
 func (*RefreshTokenRequest) ProtoMessage() {}
 
 func (x *RefreshTokenRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_idl_users_proto_msgTypes[3]
+	mi := &file_idl_users_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -229,7 +333,7 @@ func (x *RefreshTokenRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RefreshTokenRequest.ProtoReflect.Descriptor instead.
 func (*RefreshTokenRequest) Descriptor() ([]byte, []int) {
-	return file_idl_users_proto_rawDescGZIP(), []int{3}
+	return file_idl_users_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *RefreshTokenRequest) GetRefreshToken() string {
@@ -258,20 +362,29 @@ const file_idl_users_proto_rawDesc = "" +
 	"\x10UserLoginRequest\x12\x1a\n" +
 	"\busername\x18\x01 \x01(\tR\busername\x12\x1a\n" +
 	"\bpassword\x18\x02 \x01(\tR\bpassword\x12\x1a\n" +
-	"\bremember\x18\x03 \x01(\bR\bremember\"B\n" +
+	"\bremember\x18\x03 \x01(\bR\bremember\"i\n" +
 	"\x13UploadAvatarRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x12\n" +
-	"\x04file\x18\x02 \x01(\fR\x04file\"V\n" +
+	"\x04file\x18\x02 \x01(\fR\x04file\x12%\n" +
+	"\x0efile_extension\x18\x03 \x01(\tR\rfileExtension\",\n" +
+	"\x11GetMFACodeRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\"=\n" +
+	"\x0eBindMFARequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x12\n" +
+	"\x04code\x18\x02 \x01(\tR\x04code\"V\n" +
 	"\x13RefreshTokenRequest\x12#\n" +
 	"\rrefresh_token\x18\x01 \x01(\tR\frefreshToken\x12\x1a\n" +
 	"\bremember\x18\x02 \x01(\bR\bremember2\xb0\x01\n" +
 	"\x11UserPublicService\x12N\n" +
 	"\bRegister\x12\x1a.users.UserRegisterRequest\x1a\x16.common.CommonResponse\"\x0e\xd2\xc1\x18\n" +
 	"/api/users\x12K\n" +
-	"\x05Login\x12\x17.users.UserLoginRequest\x1a\x16.common.CommonResponse\"\x11\xd2\xc1\x18\r/api/sessions2\xc8\x01\n" +
+	"\x05Login\x12\x17.users.UserLoginRequest\x1a\x16.common.CommonResponse\"\x11\xd2\xc1\x18\r/api/sessions2\x88\x03\n" +
 	"\x0fUserAuthService\x12Q\n" +
 	"\vGetUserInfo\x12\x11.common.IDRequest\x1a\x16.common.CommonResponse\"\x17\xca\xc1\x18\x13/api/users/:user_id\x12b\n" +
-	"\fUploadAvatar\x12\x1a.users.UploadAvatarRequest\x1a\x16.common.CommonResponse\"\x1e\xd2\xc1\x18\x1a/api/users/:user_id/avatar2\xc2\x01\n" +
+	"\fUploadAvatar\x12\x1a.users.UploadAvatarRequest\x1a\x16.common.CommonResponse\"\x1e\xd2\xc1\x18\x1a/api/users/:user_id/avatar\x12b\n" +
+	"\n" +
+	"GetMFACode\x12\x18.users.GetMFACodeRequest\x1a\x16.common.CommonResponse\"\"\xca\xc1\x18\x1e/api/users/:user_id/mfa/qrcode\x12Z\n" +
+	"\aBindMFA\x12\x15.users.BindMFARequest\x1a\x16.common.CommonResponse\" \xd2\xc1\x18\x1c/api/users/:user_id/mfa/bind2\xc2\x01\n" +
 	"\x0eSessionService\x12_\n" +
 	"\x0eRefreshSession\x12\x1a.users.RefreshTokenRequest\x1a\x16.common.CommonResponse\"\x19\xd2\xc1\x18\x15/api/sessions/refresh\x12O\n" +
 	"\x06Logout\x12\x1a.users.RefreshTokenRequest\x1a\x16.common.CommonResponse\"\x11\xe2\xc1\x18\r/api/sessionsB\bZ\x06/usersb\x06proto3"
@@ -288,30 +401,36 @@ func file_idl_users_proto_rawDescGZIP() []byte {
 	return file_idl_users_proto_rawDescData
 }
 
-var file_idl_users_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_idl_users_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_idl_users_proto_goTypes = []any{
 	(*UserRegisterRequest)(nil),   // 0: users.UserRegisterRequest
 	(*UserLoginRequest)(nil),      // 1: users.UserLoginRequest
 	(*UploadAvatarRequest)(nil),   // 2: users.UploadAvatarRequest
-	(*RefreshTokenRequest)(nil),   // 3: users.RefreshTokenRequest
-	(*common.IDRequest)(nil),      // 4: common.IDRequest
-	(*common.CommonResponse)(nil), // 5: common.CommonResponse
+	(*GetMFACodeRequest)(nil),     // 3: users.GetMFACodeRequest
+	(*BindMFARequest)(nil),        // 4: users.BindMFARequest
+	(*RefreshTokenRequest)(nil),   // 5: users.RefreshTokenRequest
+	(*common.IDRequest)(nil),      // 6: common.IDRequest
+	(*common.CommonResponse)(nil), // 7: common.CommonResponse
 }
 var file_idl_users_proto_depIdxs = []int32{
 	0, // 0: users.UserPublicService.Register:input_type -> users.UserRegisterRequest
 	1, // 1: users.UserPublicService.Login:input_type -> users.UserLoginRequest
-	4, // 2: users.UserAuthService.GetUserInfo:input_type -> common.IDRequest
+	6, // 2: users.UserAuthService.GetUserInfo:input_type -> common.IDRequest
 	2, // 3: users.UserAuthService.UploadAvatar:input_type -> users.UploadAvatarRequest
-	3, // 4: users.SessionService.RefreshSession:input_type -> users.RefreshTokenRequest
-	3, // 5: users.SessionService.Logout:input_type -> users.RefreshTokenRequest
-	5, // 6: users.UserPublicService.Register:output_type -> common.CommonResponse
-	5, // 7: users.UserPublicService.Login:output_type -> common.CommonResponse
-	5, // 8: users.UserAuthService.GetUserInfo:output_type -> common.CommonResponse
-	5, // 9: users.UserAuthService.UploadAvatar:output_type -> common.CommonResponse
-	5, // 10: users.SessionService.RefreshSession:output_type -> common.CommonResponse
-	5, // 11: users.SessionService.Logout:output_type -> common.CommonResponse
-	6, // [6:12] is the sub-list for method output_type
-	0, // [0:6] is the sub-list for method input_type
+	3, // 4: users.UserAuthService.GetMFACode:input_type -> users.GetMFACodeRequest
+	4, // 5: users.UserAuthService.BindMFA:input_type -> users.BindMFARequest
+	5, // 6: users.SessionService.RefreshSession:input_type -> users.RefreshTokenRequest
+	5, // 7: users.SessionService.Logout:input_type -> users.RefreshTokenRequest
+	7, // 8: users.UserPublicService.Register:output_type -> common.CommonResponse
+	7, // 9: users.UserPublicService.Login:output_type -> common.CommonResponse
+	7, // 10: users.UserAuthService.GetUserInfo:output_type -> common.CommonResponse
+	7, // 11: users.UserAuthService.UploadAvatar:output_type -> common.CommonResponse
+	7, // 12: users.UserAuthService.GetMFACode:output_type -> common.CommonResponse
+	7, // 13: users.UserAuthService.BindMFA:output_type -> common.CommonResponse
+	7, // 14: users.SessionService.RefreshSession:output_type -> common.CommonResponse
+	7, // 15: users.SessionService.Logout:output_type -> common.CommonResponse
+	8, // [8:16] is the sub-list for method output_type
+	0, // [0:8] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
@@ -328,7 +447,7 @@ func file_idl_users_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_idl_users_proto_rawDesc), len(file_idl_users_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   4,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   3,
 		},

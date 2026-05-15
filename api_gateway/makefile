@@ -22,16 +22,10 @@ update-common:
 	--proto_path=.
 
 # 更新 users.proto 生成的代码
-update-user:
+update:
 	hz update \
 	--mod=$(MOD_NAME)  \
-	--idl=idl/users.proto \
+	--idl=idl/interaction.proto \
 	--out_dir=$(OUT_DIR) \
 	--proto_path=.
 
-gen-pb:
-	protoc \
-	--proto_path=. \
-    --go_out=app/pb \
-    --go-grpc_out=app/pb \
-    idl/common.proto \

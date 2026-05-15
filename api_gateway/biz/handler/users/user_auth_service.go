@@ -4,7 +4,11 @@ package users
 
 import (
 	"context"
+	"io"
 	"log"
+	"net/http"
+	"path/filepath"
+	"strings"
 
 	"github.com/ZOEKOFK/video_web_v3/api_gateway/client"
 	"github.com/ZOEKOFK/video_web_v3/api_gateway/my_jwt"
@@ -18,32 +22,15 @@ import (
 // @router /api/users/:user_id [GET]
 func GetUserInfo(ctx context.Context, c *app.RequestContext) {
 	var err error
-	
-	// ============================================
-	// 完整的 Access Token → Metadata → gRPC 流程
-	// ============================================
-	
-	// 1️⃣ 从 Access Token 中提取用户 ID
-	userID, err := my_jwt.GetUserIDFromToken(ctx, c)
-	if err != nil {
-		log.Printf("[GetUserInfo] 从 Token 提取用户 ID 失败: %v", err)
-		c.JSON(consts.StatusUnauthorized, client.FailResponse("invalid token", commonpb.ErrorCode_USER_NOT_LOGIN))
-		return
-	}
-	log.Printf("[GetUserInfo] 从 Token 中提取到用户 ID: %d", userID)
-	
-	// 2️⃣ 将用户 ID 添加到 gRPC Metadata 中
-	ctxWithUserID := client.WithUserID(ctx, userID)
-	log.Printf("[GetUserInfo] 用户 ID 已添加到 Metadata")
-	
-	// 3️⃣ 调用 gRPC 微服务（gRPC 服务端可以从 Metadata 中提取用户 ID）
 	var req commonpb.IDRequest
-	req.Id = c.Param("user_id")
-	
-	grpcResp, err := client.UserAuthServiceClient.GetUserInfo(ctxWithUserID, &req)
+	id := c.Param("user_id")
+	req.Id = id
+	//log.Println("id:", id)
+	// 调用 gRPC 微服务获取用户信息
+	grpcResp, err := client.UserAuthServiceClient.GetUserInfo(ctx, &req)
 	if err != nil {
-		log.Printf("[GetUserInfo] gRPC 调用失败: %v", err)
-		c.JSON(consts.StatusInternalServerError, client.FailResponse(err.Error(), commonpb.ErrorCode_PROGRESS_ERROR))
+		log.Printf("GetUserInfo grpc error: %v", err)
+		c.JSON(consts.StatusInternalServerError, grpcResp)
 		return
 	}
 	c.JSON(consts.StatusOK, grpcResp)
@@ -52,21 +39,113 @@ func GetUserInfo(ctx context.Context, c *app.RequestContext) {
 // UploadAvatar .
 // @router /api/users/:user_id/avatar [POST]
 func UploadAvatar(ctx context.Context, c *app.RequestContext) {
-	var err error
-	var req userspb.UploadAvatarRequest
-	err = c.BindAndValidate(&req)
+	id := c.Param("user_id")
+	log.Println(id)
+	tokenID, err := my_jwt.GetUserIDFromToken(ctx, c)
+	log.Println("tokenID:", tokenID)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		log.Printf("UploadAvatar err: %v", err)
 		return
 	}
-
-	// 调用 gRPC 微服务上传头像
-	grpcResp, err := client.UserAuthServiceClient.UploadAvatar(ctx, &req)
-	if err != nil {
-		log.Printf("UploadAvatar grpc error: %v", err)
-		c.JSON(consts.StatusInternalServerError, grpcResp)
+	isValid := my_jwt.CompareUserID(tokenID, id)
+	if !isValid {
+		c.JSON(consts.StatusOK, client.FailResponse("no rights to uploadAvatar", commonpb.ErrorCode_PARAM_ERROR))
 		return
 	}
+	fileHeader, err := c.FormFile("file")
+	if err != nil {
+		c.JSON(consts.StatusOK, client.FailResponse(err.Error(), commonpb.ErrorCode_PARAM_ERROR))
+		return
+	}
+	if fileHeader.Size >= 2*1024*1024 {
+		c.JSON(consts.StatusOK, client.FailResponse("file too large", commonpb.ErrorCode_PARAM_ERROR))
+		return
+	}
+	format := map[string]bool{
+		".png":  true,
+		".jpeg": true,
+		".jpg":  true,
+	}
+	name := strings.ToLower(filepath.Ext(fileHeader.Filename))
+	if !format[name] {
+		log.Printf("file %s not support", name)
+		return
+	}
+	file, err := fileHeader.Open()
+	if err != nil {
+		log.Println("open file err:", err)
+		return
+	}
+	fileBytes, err := io.ReadAll(file)
+	req := &userspb.UploadAvatarRequest{
+		UserId:        id,
+		File:          fileBytes,
+		FileExtension: filepath.Ext(fileHeader.Filename),
+	}
+	resp, err := client.UserAuthServiceClient.UploadAvatar(ctx, req)
+	if err != nil {
+		c.JSON(consts.StatusInternalServerError, resp)
+		return
+	}
+	c.JSON(consts.StatusOK, resp)
+}
 
-	c.JSON(consts.StatusOK, grpcResp)
+// GetMFACode .
+// @router /api/users/:user_id/mfa/qrcode [GET]
+func GetMFACode(ctx context.Context, c *app.RequestContext) {
+	userID, err := my_jwt.GetUserIDFromToken(ctx, c)
+	if err != nil {
+		log.Printf("[GetMFACode] token提取用户 ID 失败: %v", err)
+		c.JSON(consts.StatusUnauthorized, client.FailResponse("invalid token", commonpb.ErrorCode_USER_NOT_LOGIN))
+		return
+	}
+	userIDStr := c.Param("user_id")
+	isValid := my_jwt.CompareUserID(userID, userIDStr)
+	if !isValid {
+		c.JSON(consts.StatusOK, client.FailResponse("no rights", commonpb.ErrorCode_OPERATION_FORBIDDEN))
+		return
+	}
+	req := &userspb.GetMFACodeRequest{
+		UserId: userIDStr,
+	}
+	ctxWithUserID := client.WithUserID(ctx, userID)
+	resp, err := client.UserAuthServiceClient.GetMFACode(ctxWithUserID, req)
+	if err != nil {
+		log.Printf("[GetMFACode] gRPC调用失败: %v", err)
+		c.JSON(http.StatusInternalServerError, client.FailResponse(err.Error(), commonpb.ErrorCode_PROGRESS_ERROR))
+		return
+	}
+	c.JSON(consts.StatusOK, resp)
+}
+
+// BindMFA .
+// @router /api/users/:user_id/mfa/bind [POST]
+func BindMFA(ctx context.Context, c *app.RequestContext) {
+	userID, err := my_jwt.GetUserIDFromToken(ctx, c)
+	if err != nil {
+		log.Printf("[BindMFA] token提取用户 ID 失败: %v", err)
+		c.JSON(consts.StatusUnauthorized, client.FailResponse("invalid token", commonpb.ErrorCode_USER_NOT_LOGIN))
+		return
+	}
+	userIDStr := c.Param("user_id")
+	isValid := my_jwt.CompareUserID(userID, userIDStr)
+	if !isValid {
+		c.JSON(consts.StatusOK, client.FailResponse("no rights", commonpb.ErrorCode_OPERATION_FORBIDDEN))
+		return
+	}
+	var req userspb.BindMFARequest
+	if err := c.Bind(&req); err != nil {
+		log.Printf("[BindMFA] 参数绑定失败: %v", err)
+		c.JSON(consts.StatusBadRequest, client.FailResponse(err.Error(), commonpb.ErrorCode_PARAM_ERROR))
+		return
+	}
+	req.UserId = userIDStr
+	ctxWithUserID := client.WithUserID(ctx, userID)
+	resp, err := client.UserAuthServiceClient.BindMFA(ctxWithUserID, &req)
+	if err != nil {
+		log.Printf("[BindMFA] gRPC调用失败: %v", err)
+		c.JSON(http.StatusInternalServerError, client.FailResponse(err.Error(), commonpb.ErrorCode_PROGRESS_ERROR))
+		return
+	}
+	c.JSON(consts.StatusOK, resp)
 }

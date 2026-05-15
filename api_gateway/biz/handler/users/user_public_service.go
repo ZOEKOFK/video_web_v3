@@ -9,7 +9,7 @@ import (
 
 	"github.com/ZOEKOFK/video_web_v3/api_gateway/client"
 	"github.com/ZOEKOFK/video_web_v3/app/pb/common"
-	users "github.com/ZOEKOFK/video_web_v3/app/pb/users"
+	userspb "github.com/ZOEKOFK/video_web_v3/app/pb/users"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )
@@ -18,7 +18,7 @@ import (
 // @router /api/users [POST]
 func Register(ctx context.Context, c *app.RequestContext) {
 	var err error
-	var req users.UserRegisterRequest
+	var req userspb.UserRegisterRequest
 	err = c.BindJSON(&req)
 	log.Println(req.Password)
 	if err != nil {
@@ -27,8 +27,6 @@ func Register(ctx context.Context, c *app.RequestContext) {
 	}
 	grpcResp, err := client.UserPublicServiceClient.Register(ctx, &req)
 	if err != nil {
-		//log.Println(err)
-		//log.Println(grpcResp)
 		c.JSON(http.StatusInternalServerError, grpcResp)
 		return
 	}
@@ -38,12 +36,12 @@ func Register(ctx context.Context, c *app.RequestContext) {
 // Login .
 // @router /api/sessions [POST]
 func Login(ctx context.Context, c *app.RequestContext) {
-	var req users.UserLoginRequest
+	var req userspb.UserLoginRequest
 	if err := c.Bind(&req); err != nil {
 		c.JSON(http.StatusBadRequest, client.FailResponse("Invalid request", common.ErrorCode_PARAM_ERROR))
 		return
 	}
-
+	log.Println(req.Password)
 	resp, err := client.UserPublicServiceClient.Login(ctx, &req)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, resp)

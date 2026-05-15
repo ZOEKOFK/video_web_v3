@@ -2,9 +2,7 @@ package service_logic
 
 import (
 	"errors"
-	"fmt"
 
-	"github.com/ZOEKOFK/video_web_v3/app/domain/model"
 	"github.com/ZOEKOFK/video_web_v3/app/domain/repository"
 	"github.com/ZOEKOFK/video_web_v3/app/pb/users"
 	"golang.org/x/crypto/bcrypt"
@@ -30,7 +28,7 @@ func (u *UsersServiceLogic) CheckLoginInfo(username string, password string) err
 	if username == "" || password == "" {
 		return errors.New("username or password is empty")
 	}
-	if len(password) <= 8 {
+	if len(password) < 8 {
 		return errors.New("password is too short")
 	}
 	user, err := u.repo.GetUserInfoByUserName(username)
@@ -68,14 +66,4 @@ func (u *UsersServiceLogic) EncryptPassword(password string) (string, error) {
 		return "", err
 	}
 	return string(hashedPassword), nil
-}
-
-// ValidateUserID 验证用户 ID 是否有效（检查数据库）
-func (u *UsersServiceLogic) ValidateUserID(userID int64) (*model.Users, error) {
-	idStr := fmt.Sprintf("%d", userID)
-	user, err := u.repo.GetUserInfoByID(idStr)
-	if err != nil {
-		return nil, errors.New("user not found")
-	}
-	return &user, nil
 }

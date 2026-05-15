@@ -1,0 +1,59 @@
+syntax = "proto3";
+
+package videos;
+import "idl/common.proto";
+import "idl/api.proto";
+
+option go_package = "/videos";
+
+// 上传视频请求
+message UploadVideoRequest {
+  string title = 1;        // 标题
+  string description = 2;  // 描述
+  bytes file = 3;          // 视频文件数据
+  string file_extension = 4; // 文件后缀，如 "mp4", "avi", "mov"
+}
+
+// 用户视频列表请求
+message UserVideoListRequest {
+  int32 page = 1;         // 页码
+  int32 page_size = 2;     // 每页大小
+  uint64 id = 3;
+}
+
+// 搜索视频请求
+message SearchVideoRequest {
+  string keyword = 1;      // 关键词
+  int32 page = 2;         // 页码
+  int32 page_size = 3;     // 每页大小
+  string sort = 4;         // 排序方式
+}
+
+// 热门视频请求
+message HotVideoRequest {
+  int32 limit = 1;         // 数量限制
+  string type = 2;         // 类型
+  int32 page = 3;         // 页码
+}
+
+// 视频公共服务
+service VideoPublicService {
+  rpc SearchVideos(SearchVideoRequest) returns (common.CommonResponse){
+    option (api.get) = "/api/videos/search";
+  }
+
+  rpc GetHotVideos(HotVideoRequest) returns (common.CommonResponse){
+    option (api.get) = "/api/videos/hot";
+  }
+
+  rpc GetUserVideos(UserVideoListRequest) returns (common.CommonResponse){
+    option (api.get) = "/api/users/:user_id/videos";
+  }
+}
+
+// 视频认证服务
+service VideoAuthService {
+  rpc UploadVideo(UploadVideoRequest) returns (common.CommonResponse){
+    option (api.post) = "/api/videos";
+  }
+}

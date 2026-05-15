@@ -12,16 +12,14 @@ import (
 )
 
 func main() {
-	//初始化JWT
 	err := my_jwt.InitJWT()
 	if err != nil {
-		log.Println("init jwt fail")
+		log.Fatalf("init jwt fail: %v", err)
 	}
-	// 初始化 gRPC 客户端
+
 	client.InitGRPCClient()
 
-	h := server.Default()
-
+	h := server.Default(server.WithHostPorts(":8888"), server.WithMaxRequestBodySize(500*1024*1024))
 	router.GeneratedRegister(h)
 	h.Spin()
 }

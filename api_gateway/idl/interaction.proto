@@ -1,0 +1,87 @@
+syntax = "proto3";
+
+package interaction;
+
+option go_package = "/interaction";
+
+import "idl/common.proto";
+import "idl/api.proto";
+
+// ==================== 点赞相关 ====================
+
+// 点赞操作请求
+message LikeRequest {
+  int64 target_id = 1;    // 目标ID（视频/评论ID）
+  int32 type = 2;         // 类型：1视频 2评论
+  bool status = 3;         // 点赞状态：true点赞 false取消点赞
+}
+
+// 点赞列表请求
+message LikeListRequest {
+  int64 target_id = 1;    // 目标ID
+  int32 type = 2;         // 类型：1视频 2评论
+  int32 page = 3;         // 页码
+  int32 page_size = 4;     // 每页大小
+}
+
+// ==================== 评论相关 ====================
+
+// 发表评论请求
+message CreateCommentRequest {
+  int64 video_id = 1;      // 视频ID
+  int64 parent_id = 2;     // 父评论ID（0表示一级评论）
+  string content = 3;      // 评论内容
+}
+
+// 评论列表请求
+message CommentListRequest {
+  int64 video_id = 1;      // 视频ID
+  int32 page = 2;         // 页码
+  int32 page_size = 3;     // 每页大小
+}
+
+// 删除评论请求
+message DeleteCommentRequest {
+  int64 comment_id = 1;    // 评论ID
+}
+
+// ==================== 服务定义 ====================
+
+// 点赞服务（需要登录）
+service LikeAuthService {
+  // 点赞/取消点赞
+  // @router /api/likes [POST]
+  rpc LikeAction(LikeRequest) returns (common.CommonResponse) {
+    option (api.post) = "/api/likes";
+  }
+
+  // 获取点赞列表
+  // @router /api/likes/list [GET]
+  rpc GetLikeList(LikeListRequest) returns (common.CommonResponse) {
+    option (api.get) = "/api/likes/list";
+  }
+}
+
+// 评论服务（需要登录）
+service CommentAuthService {
+  // 发表评论
+  // @router /api/comments [POST]
+  rpc CreateComment(CreateCommentRequest) returns (common.CommonResponse) {
+    option (api.post) = "/api/comments";
+  }
+
+  // 删除评论
+  // @router /api/comments/:comment_id [DELETE]
+  rpc DeleteComment(DeleteCommentRequest) returns (common.CommonResponse) {
+    option (api.delete) = "/api/comments/:comment_id";
+  }
+}
+
+// 评论公共服务（无需登录）
+service CommentPublicService {
+  // 获取评论列表
+  // @router /api/videos/:video_id/comments [GET]
+  rpc GetCommentList(CommentListRequest) returns (common.CommonResponse) {
+    option (api.get) = "/api/videos/:video_id/comments";
+  }
+}

@@ -1,0 +1,65 @@
+syntax = "proto3";
+
+package social;
+
+option go_package = "/social";
+
+import "idl/common.proto";
+import "idl/api.proto";
+
+// 关注请求
+message FollowRequest {
+  int64 user_id = 1;      // 用户ID
+  bool status = 2;         // true关注 false取消关注
+}
+
+// 关注列表请求
+message FollowListRequest {
+  int32 page = 1;         // 页码
+  int32 page_size = 2;     // 每页大小
+  int64 user_id = 3;
+}
+
+// 粉丝列表请求
+message FollowerListRequest {
+  int32 page = 1;         // 页码
+  int32 page_size = 2;     // 每页大小
+  int64 user_id = 3;
+}
+
+// 好友列表请求
+message FriendListRequest {
+  int32 page = 1;         // 页码
+  int32 page_size = 2;     // 每页大小
+  int64 user_id = 3;
+}
+
+// 关注认证服务
+service FollowAuthService {
+  // 关注/取消关注
+  // @router /api/follows [POST]
+  rpc FollowAction(FollowRequest) returns (common.CommonResponse) {
+    option (api.post) = "/api/follows";
+  }
+
+  // 获取好友列表
+  // @router /api/users/friends [GET]
+  rpc GetFriendList(FriendListRequest) returns (common.CommonResponse) {
+    option (api.get) = "/api/users/friends";
+  }
+}
+
+// 关注公共服务
+service FollowPublicService {
+  // 获取关注列表
+  // @router /api/users/:user_id/followings [GET]
+  rpc GetFollowList(FollowListRequest) returns (common.CommonResponse) {
+    option (api.get) = "/api/users/:user_id/followings";
+  }
+
+  // 获取粉丝列表
+  // @router /api/users/:user_id/followers [GET]
+  rpc GetFollowerList(FollowerListRequest) returns (common.CommonResponse) {
+    option (api.get) = "/api/users/:user_id/followers";
+  }
+}

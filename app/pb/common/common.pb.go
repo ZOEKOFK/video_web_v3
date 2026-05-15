@@ -24,8 +24,9 @@ const (
 type ErrorCode int32
 
 const (
-	ErrorCode_SUCCESS             ErrorCode = 0    // 成功
-	ErrorCode_REQUEST_ERROR       ErrorCode = 1    // 获取请求失败
+	ErrorCode_NOTHING             ErrorCode = 0
+	ErrorCode_SUCCESS             ErrorCode = 1
+	ErrorCode_REQUEST_ERROR       ErrorCode = 1000 // 获取请求失败
 	ErrorCode_PARAM_ERROR         ErrorCode = 1001 // 参数错误
 	ErrorCode_USER_NOT_LOGIN      ErrorCode = 2001 // 用户未登录
 	ErrorCode_USER_EXIST          ErrorCode = 2002 // 用户已存在
@@ -41,8 +42,9 @@ const (
 // Enum value maps for ErrorCode.
 var (
 	ErrorCode_name = map[int32]string{
-		0:    "SUCCESS",
-		1:    "REQUEST_ERROR",
+		0:    "NOTHING",
+		1:    "SUCCESS",
+		1000: "REQUEST_ERROR",
 		1001: "PARAM_ERROR",
 		2001: "USER_NOT_LOGIN",
 		2002: "USER_EXIST",
@@ -55,8 +57,9 @@ var (
 		6001: "PROGRESS_ERROR",
 	}
 	ErrorCode_value = map[string]int32{
-		"SUCCESS":             0,
-		"REQUEST_ERROR":       1,
+		"NOTHING":             0,
+		"SUCCESS":             1,
+		"REQUEST_ERROR":       1000,
 		"PARAM_ERROR":         1001,
 		"USER_NOT_LOGIN":      2001,
 		"USER_EXIST":          2002,
@@ -182,6 +185,294 @@ func (x *User) GetUpdatedAt() string {
 	return ""
 }
 
+// 视频信息
+type Video struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Title         string                 `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
+	Description   string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	VideoUrl      string                 `protobuf:"bytes,4,opt,name=video_url,json=videoUrl,proto3" json:"video_url,omitempty"`
+	Views         int32                  `protobuf:"varint,5,opt,name=views,proto3" json:"views,omitempty"`
+	Likes         int32                  `protobuf:"varint,6,opt,name=likes,proto3" json:"likes,omitempty"`
+	Comments      int32                  `protobuf:"varint,7,opt,name=comments,proto3" json:"comments,omitempty"`
+	CreatedAt     string                 `protobuf:"bytes,8,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	UpdatedAt     string                 `protobuf:"bytes,9,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Video) Reset() {
+	*x = Video{}
+	mi := &file_idl_common_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Video) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Video) ProtoMessage() {}
+
+func (x *Video) ProtoReflect() protoreflect.Message {
+	mi := &file_idl_common_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Video.ProtoReflect.Descriptor instead.
+func (*Video) Descriptor() ([]byte, []int) {
+	return file_idl_common_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *Video) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *Video) GetTitle() string {
+	if x != nil {
+		return x.Title
+	}
+	return ""
+}
+
+func (x *Video) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *Video) GetVideoUrl() string {
+	if x != nil {
+		return x.VideoUrl
+	}
+	return ""
+}
+
+func (x *Video) GetViews() int32 {
+	if x != nil {
+		return x.Views
+	}
+	return 0
+}
+
+func (x *Video) GetLikes() int32 {
+	if x != nil {
+		return x.Likes
+	}
+	return 0
+}
+
+func (x *Video) GetComments() int32 {
+	if x != nil {
+		return x.Comments
+	}
+	return 0
+}
+
+func (x *Video) GetCreatedAt() string {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return ""
+}
+
+func (x *Video) GetUpdatedAt() string {
+	if x != nil {
+		return x.UpdatedAt
+	}
+	return ""
+}
+
+// 评论信息
+type Comment struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	UserId        int64                  `protobuf:"varint,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	VideoId       int64                  `protobuf:"varint,3,opt,name=video_id,json=videoId,proto3" json:"video_id,omitempty"`
+	ParentId      int64                  `protobuf:"varint,4,opt,name=parent_id,json=parentId,proto3" json:"parent_id,omitempty"`
+	Content       string                 `protobuf:"bytes,5,opt,name=content,proto3" json:"content,omitempty"`
+	Likes         int64                  `protobuf:"varint,6,opt,name=likes,proto3" json:"likes,omitempty"`
+	UserInfo      *User                  `protobuf:"bytes,7,opt,name=user_info,json=userInfo,proto3" json:"user_info,omitempty"`
+	ReplyList     []*Comment             `protobuf:"bytes,8,rep,name=reply_list,json=replyList,proto3" json:"reply_list,omitempty"`
+	CreatedAt     string                 `protobuf:"bytes,9,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	UpdatedAt     string                 `protobuf:"bytes,10,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Comment) Reset() {
+	*x = Comment{}
+	mi := &file_idl_common_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Comment) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Comment) ProtoMessage() {}
+
+func (x *Comment) ProtoReflect() protoreflect.Message {
+	mi := &file_idl_common_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Comment.ProtoReflect.Descriptor instead.
+func (*Comment) Descriptor() ([]byte, []int) {
+	return file_idl_common_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *Comment) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *Comment) GetUserId() int64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+func (x *Comment) GetVideoId() int64 {
+	if x != nil {
+		return x.VideoId
+	}
+	return 0
+}
+
+func (x *Comment) GetParentId() int64 {
+	if x != nil {
+		return x.ParentId
+	}
+	return 0
+}
+
+func (x *Comment) GetContent() string {
+	if x != nil {
+		return x.Content
+	}
+	return ""
+}
+
+func (x *Comment) GetLikes() int64 {
+	if x != nil {
+		return x.Likes
+	}
+	return 0
+}
+
+func (x *Comment) GetUserInfo() *User {
+	if x != nil {
+		return x.UserInfo
+	}
+	return nil
+}
+
+func (x *Comment) GetReplyList() []*Comment {
+	if x != nil {
+		return x.ReplyList
+	}
+	return nil
+}
+
+func (x *Comment) GetCreatedAt() string {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return ""
+}
+
+func (x *Comment) GetUpdatedAt() string {
+	if x != nil {
+		return x.UpdatedAt
+	}
+	return ""
+}
+
+// 点赞用户信息
+type LikeUser struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        int64                  `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	UserInfo      *User                  `protobuf:"bytes,2,opt,name=user_info,json=userInfo,proto3" json:"user_info,omitempty"`
+	CreatedAt     string                 `protobuf:"bytes,3,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LikeUser) Reset() {
+	*x = LikeUser{}
+	mi := &file_idl_common_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LikeUser) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LikeUser) ProtoMessage() {}
+
+func (x *LikeUser) ProtoReflect() protoreflect.Message {
+	mi := &file_idl_common_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LikeUser.ProtoReflect.Descriptor instead.
+func (*LikeUser) Descriptor() ([]byte, []int) {
+	return file_idl_common_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *LikeUser) GetUserId() int64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+func (x *LikeUser) GetUserInfo() *User {
+	if x != nil {
+		return x.UserInfo
+	}
+	return nil
+}
+
+func (x *LikeUser) GetCreatedAt() string {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return ""
+}
+
+// Token 信息
 type Token struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	AccessExpire  string                 `protobuf:"bytes,1,opt,name=access_expire,json=accessExpire,proto3" json:"access_expire,omitempty"`
@@ -194,7 +485,7 @@ type Token struct {
 
 func (x *Token) Reset() {
 	*x = Token{}
-	mi := &file_idl_common_proto_msgTypes[1]
+	mi := &file_idl_common_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -206,7 +497,7 @@ func (x *Token) String() string {
 func (*Token) ProtoMessage() {}
 
 func (x *Token) ProtoReflect() protoreflect.Message {
-	mi := &file_idl_common_proto_msgTypes[1]
+	mi := &file_idl_common_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -219,7 +510,7 @@ func (x *Token) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Token.ProtoReflect.Descriptor instead.
 func (*Token) Descriptor() ([]byte, []int) {
-	return file_idl_common_proto_rawDescGZIP(), []int{1}
+	return file_idl_common_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *Token) GetAccessExpire() string {
@@ -250,17 +541,78 @@ func (x *Token) GetRefreshToken() string {
 	return ""
 }
 
+// MFA信息
+type MFA struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	MfaSecret     string                 `protobuf:"bytes,1,opt,name=mfa_secret,json=mfaSecret,proto3" json:"mfa_secret,omitempty"`
+	MfaQrcodeUrl  string                 `protobuf:"bytes,2,opt,name=mfa_qrcode_url,json=mfaQrcodeUrl,proto3" json:"mfa_qrcode_url,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *MFA) Reset() {
+	*x = MFA{}
+	mi := &file_idl_common_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *MFA) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MFA) ProtoMessage() {}
+
+func (x *MFA) ProtoReflect() protoreflect.Message {
+	mi := &file_idl_common_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MFA.ProtoReflect.Descriptor instead.
+func (*MFA) Descriptor() ([]byte, []int) {
+	return file_idl_common_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *MFA) GetMfaSecret() string {
+	if x != nil {
+		return x.MfaSecret
+	}
+	return ""
+}
+
+func (x *MFA) GetMfaQrcodeUrl() string {
+	if x != nil {
+		return x.MfaQrcodeUrl
+	}
+	return ""
+}
+
+// 通用数据
 type Data struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UserInfo      *User                  `protobuf:"bytes,1,opt,name=user_info,json=userInfo,proto3" json:"user_info,omitempty"`
 	TokenInfo     *Token                 `protobuf:"bytes,2,opt,name=token_info,json=tokenInfo,proto3" json:"token_info,omitempty"`
+	VideoList     []*Video               `protobuf:"bytes,3,rep,name=video_list,json=videoList,proto3" json:"video_list,omitempty"`
+	VideoInfo     *Video                 `protobuf:"bytes,4,opt,name=video_info,json=videoInfo,proto3" json:"video_info,omitempty"`
+	UserList      []*User                `protobuf:"bytes,5,rep,name=user_list,json=userList,proto3" json:"user_list,omitempty"`
+	CommentInfo   *Comment               `protobuf:"bytes,6,opt,name=comment_info,json=commentInfo,proto3" json:"comment_info,omitempty"`
+	CommentList   []*Comment             `protobuf:"bytes,7,rep,name=comment_list,json=commentList,proto3" json:"comment_list,omitempty"`
+	TotalCount    int32                  `protobuf:"varint,8,opt,name=total_count,json=totalCount,proto3" json:"total_count,omitempty"`
+	MfaInfo       *MFA                   `protobuf:"bytes,9,opt,name=mfa_info,json=mfaInfo,proto3" json:"mfa_info,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *Data) Reset() {
 	*x = Data{}
-	mi := &file_idl_common_proto_msgTypes[2]
+	mi := &file_idl_common_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -272,7 +624,7 @@ func (x *Data) String() string {
 func (*Data) ProtoMessage() {}
 
 func (x *Data) ProtoReflect() protoreflect.Message {
-	mi := &file_idl_common_proto_msgTypes[2]
+	mi := &file_idl_common_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -285,7 +637,7 @@ func (x *Data) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Data.ProtoReflect.Descriptor instead.
 func (*Data) Descriptor() ([]byte, []int) {
-	return file_idl_common_proto_rawDescGZIP(), []int{2}
+	return file_idl_common_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *Data) GetUserInfo() *User {
@@ -302,6 +654,56 @@ func (x *Data) GetTokenInfo() *Token {
 	return nil
 }
 
+func (x *Data) GetVideoList() []*Video {
+	if x != nil {
+		return x.VideoList
+	}
+	return nil
+}
+
+func (x *Data) GetVideoInfo() *Video {
+	if x != nil {
+		return x.VideoInfo
+	}
+	return nil
+}
+
+func (x *Data) GetUserList() []*User {
+	if x != nil {
+		return x.UserList
+	}
+	return nil
+}
+
+func (x *Data) GetCommentInfo() *Comment {
+	if x != nil {
+		return x.CommentInfo
+	}
+	return nil
+}
+
+func (x *Data) GetCommentList() []*Comment {
+	if x != nil {
+		return x.CommentList
+	}
+	return nil
+}
+
+func (x *Data) GetTotalCount() int32 {
+	if x != nil {
+		return x.TotalCount
+	}
+	return 0
+}
+
+func (x *Data) GetMfaInfo() *MFA {
+	if x != nil {
+		return x.MfaInfo
+	}
+	return nil
+}
+
+// 通用响应
 type CommonResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Code          ErrorCode              `protobuf:"varint,1,opt,name=code,proto3,enum=common.ErrorCode" json:"code,omitempty"`
@@ -313,7 +715,7 @@ type CommonResponse struct {
 
 func (x *CommonResponse) Reset() {
 	*x = CommonResponse{}
-	mi := &file_idl_common_proto_msgTypes[3]
+	mi := &file_idl_common_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -325,7 +727,7 @@ func (x *CommonResponse) String() string {
 func (*CommonResponse) ProtoMessage() {}
 
 func (x *CommonResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_idl_common_proto_msgTypes[3]
+	mi := &file_idl_common_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -338,14 +740,14 @@ func (x *CommonResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CommonResponse.ProtoReflect.Descriptor instead.
 func (*CommonResponse) Descriptor() ([]byte, []int) {
-	return file_idl_common_proto_rawDescGZIP(), []int{3}
+	return file_idl_common_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *CommonResponse) GetCode() ErrorCode {
 	if x != nil {
 		return x.Code
 	}
-	return ErrorCode_SUCCESS
+	return ErrorCode_NOTHING
 }
 
 func (x *CommonResponse) GetMessage() string {
@@ -373,7 +775,7 @@ type Pagination struct {
 
 func (x *Pagination) Reset() {
 	*x = Pagination{}
-	mi := &file_idl_common_proto_msgTypes[4]
+	mi := &file_idl_common_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -385,7 +787,7 @@ func (x *Pagination) String() string {
 func (*Pagination) ProtoMessage() {}
 
 func (x *Pagination) ProtoReflect() protoreflect.Message {
-	mi := &file_idl_common_proto_msgTypes[4]
+	mi := &file_idl_common_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -398,7 +800,7 @@ func (x *Pagination) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Pagination.ProtoReflect.Descriptor instead.
 func (*Pagination) Descriptor() ([]byte, []int) {
-	return file_idl_common_proto_rawDescGZIP(), []int{4}
+	return file_idl_common_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *Pagination) GetPage() int32 {
@@ -425,7 +827,7 @@ type IDRequest struct {
 
 func (x *IDRequest) Reset() {
 	*x = IDRequest{}
-	mi := &file_idl_common_proto_msgTypes[5]
+	mi := &file_idl_common_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -437,7 +839,7 @@ func (x *IDRequest) String() string {
 func (*IDRequest) ProtoMessage() {}
 
 func (x *IDRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_idl_common_proto_msgTypes[5]
+	mi := &file_idl_common_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -450,7 +852,7 @@ func (x *IDRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use IDRequest.ProtoReflect.Descriptor instead.
 func (*IDRequest) Descriptor() ([]byte, []int) {
-	return file_idl_common_proto_rawDescGZIP(), []int{5}
+	return file_idl_common_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *IDRequest) GetId() string {
@@ -471,7 +873,7 @@ type FileUploadRequest struct {
 
 func (x *FileUploadRequest) Reset() {
 	*x = FileUploadRequest{}
-	mi := &file_idl_common_proto_msgTypes[6]
+	mi := &file_idl_common_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -483,7 +885,7 @@ func (x *FileUploadRequest) String() string {
 func (*FileUploadRequest) ProtoMessage() {}
 
 func (x *FileUploadRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_idl_common_proto_msgTypes[6]
+	mi := &file_idl_common_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -496,7 +898,7 @@ func (x *FileUploadRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FileUploadRequest.ProtoReflect.Descriptor instead.
 func (*FileUploadRequest) Descriptor() ([]byte, []int) {
-	return file_idl_common_proto_rawDescGZIP(), []int{6}
+	return file_idl_common_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *FileUploadRequest) GetFileKey() string {
@@ -527,16 +929,62 @@ const file_idl_common_proto_rawDesc = "" +
 	"\n" +
 	"created_at\x18\x06 \x01(\tR\tcreatedAt\x12\x1d\n" +
 	"\n" +
-	"updated_at\x18\a \x01(\tR\tupdatedAt\"\x9b\x01\n" +
+	"updated_at\x18\a \x01(\tR\tupdatedAt\"\xf2\x01\n" +
+	"\x05Video\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x14\n" +
+	"\x05title\x18\x02 \x01(\tR\x05title\x12 \n" +
+	"\vdescription\x18\x03 \x01(\tR\vdescription\x12\x1b\n" +
+	"\tvideo_url\x18\x04 \x01(\tR\bvideoUrl\x12\x14\n" +
+	"\x05views\x18\x05 \x01(\x05R\x05views\x12\x14\n" +
+	"\x05likes\x18\x06 \x01(\x05R\x05likes\x12\x1a\n" +
+	"\bcomments\x18\a \x01(\x05R\bcomments\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\b \x01(\tR\tcreatedAt\x12\x1d\n" +
+	"\n" +
+	"updated_at\x18\t \x01(\tR\tupdatedAt\"\xb3\x02\n" +
+	"\aComment\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x17\n" +
+	"\auser_id\x18\x02 \x01(\x03R\x06userId\x12\x19\n" +
+	"\bvideo_id\x18\x03 \x01(\x03R\avideoId\x12\x1b\n" +
+	"\tparent_id\x18\x04 \x01(\x03R\bparentId\x12\x18\n" +
+	"\acontent\x18\x05 \x01(\tR\acontent\x12\x14\n" +
+	"\x05likes\x18\x06 \x01(\x03R\x05likes\x12)\n" +
+	"\tuser_info\x18\a \x01(\v2\f.common.UserR\buserInfo\x12.\n" +
+	"\n" +
+	"reply_list\x18\b \x03(\v2\x0f.common.CommentR\treplyList\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\t \x01(\tR\tcreatedAt\x12\x1d\n" +
+	"\n" +
+	"updated_at\x18\n" +
+	" \x01(\tR\tupdatedAt\"m\n" +
+	"\bLikeUser\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\x03R\x06userId\x12)\n" +
+	"\tuser_info\x18\x02 \x01(\v2\f.common.UserR\buserInfo\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\x03 \x01(\tR\tcreatedAt\"\x9b\x01\n" +
 	"\x05Token\x12#\n" +
 	"\raccess_expire\x18\x01 \x01(\tR\faccessExpire\x12!\n" +
 	"\faccess_token\x18\x02 \x01(\tR\vaccessToken\x12%\n" +
 	"\x0erefresh_expire\x18\x03 \x01(\tR\rrefreshExpire\x12#\n" +
-	"\rrefresh_token\x18\x04 \x01(\tR\frefreshToken\"_\n" +
+	"\rrefresh_token\x18\x04 \x01(\tR\frefreshToken\"J\n" +
+	"\x03MFA\x12\x1d\n" +
+	"\n" +
+	"mfa_secret\x18\x01 \x01(\tR\tmfaSecret\x12$\n" +
+	"\x0emfa_qrcode_url\x18\x02 \x01(\tR\fmfaQrcodeUrl\"\x97\x03\n" +
 	"\x04Data\x12)\n" +
 	"\tuser_info\x18\x01 \x01(\v2\f.common.UserR\buserInfo\x12,\n" +
 	"\n" +
-	"token_info\x18\x02 \x01(\v2\r.common.TokenR\ttokenInfo\"s\n" +
+	"token_info\x18\x02 \x01(\v2\r.common.TokenR\ttokenInfo\x12,\n" +
+	"\n" +
+	"video_list\x18\x03 \x03(\v2\r.common.VideoR\tvideoList\x12,\n" +
+	"\n" +
+	"video_info\x18\x04 \x01(\v2\r.common.VideoR\tvideoInfo\x12)\n" +
+	"\tuser_list\x18\x05 \x03(\v2\f.common.UserR\buserList\x122\n" +
+	"\fcomment_info\x18\x06 \x01(\v2\x0f.common.CommentR\vcommentInfo\x122\n" +
+	"\fcomment_list\x18\a \x03(\v2\x0f.common.CommentR\vcommentList\x12\x1f\n" +
+	"\vtotal_count\x18\b \x01(\x05R\n" +
+	"totalCount\x12&\n" +
+	"\bmfa_info\x18\t \x01(\v2\v.common.MFAR\amfaInfo\"s\n" +
 	"\x0eCommonResponse\x12%\n" +
 	"\x04code\x18\x01 \x01(\x0e2\x11.common.ErrorCodeR\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12 \n" +
@@ -549,10 +997,11 @@ const file_idl_common_proto_rawDesc = "" +
 	"\x02id\x18\x01 \x01(\tR\x02id\"K\n" +
 	"\x11FileUploadRequest\x12\x19\n" +
 	"\bfile_key\x18\x01 \x01(\tR\afileKey\x12\x1b\n" +
-	"\tfile_type\x18\x02 \x01(\tR\bfileType*\x88\x02\n" +
+	"\tfile_type\x18\x02 \x01(\tR\bfileType*\x96\x02\n" +
 	"\tErrorCode\x12\v\n" +
-	"\aSUCCESS\x10\x00\x12\x11\n" +
-	"\rREQUEST_ERROR\x10\x01\x12\x10\n" +
+	"\aNOTHING\x10\x00\x12\v\n" +
+	"\aSUCCESS\x10\x01\x12\x12\n" +
+	"\rREQUEST_ERROR\x10\xe8\a\x12\x10\n" +
 	"\vPARAM_ERROR\x10\xe9\a\x12\x13\n" +
 	"\x0eUSER_NOT_LOGIN\x10\xd1\x0f\x12\x0f\n" +
 	"\n" +
@@ -578,27 +1027,40 @@ func file_idl_common_proto_rawDescGZIP() []byte {
 }
 
 var file_idl_common_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_idl_common_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_idl_common_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_idl_common_proto_goTypes = []any{
 	(ErrorCode)(0),            // 0: common.ErrorCode
 	(*User)(nil),              // 1: common.User
-	(*Token)(nil),             // 2: common.Token
-	(*Data)(nil),              // 3: common.Data
-	(*CommonResponse)(nil),    // 4: common.CommonResponse
-	(*Pagination)(nil),        // 5: common.Pagination
-	(*IDRequest)(nil),         // 6: common.IDRequest
-	(*FileUploadRequest)(nil), // 7: common.FileUploadRequest
+	(*Video)(nil),             // 2: common.Video
+	(*Comment)(nil),           // 3: common.Comment
+	(*LikeUser)(nil),          // 4: common.LikeUser
+	(*Token)(nil),             // 5: common.Token
+	(*MFA)(nil),               // 6: common.MFA
+	(*Data)(nil),              // 7: common.Data
+	(*CommonResponse)(nil),    // 8: common.CommonResponse
+	(*Pagination)(nil),        // 9: common.Pagination
+	(*IDRequest)(nil),         // 10: common.IDRequest
+	(*FileUploadRequest)(nil), // 11: common.FileUploadRequest
 }
 var file_idl_common_proto_depIdxs = []int32{
-	1, // 0: common.Data.user_info:type_name -> common.User
-	2, // 1: common.Data.token_info:type_name -> common.Token
-	0, // 2: common.CommonResponse.code:type_name -> common.ErrorCode
-	3, // 3: common.CommonResponse.data:type_name -> common.Data
-	4, // [4:4] is the sub-list for method output_type
-	4, // [4:4] is the sub-list for method input_type
-	4, // [4:4] is the sub-list for extension type_name
-	4, // [4:4] is the sub-list for extension extendee
-	0, // [0:4] is the sub-list for field type_name
+	1,  // 0: common.Comment.user_info:type_name -> common.User
+	3,  // 1: common.Comment.reply_list:type_name -> common.Comment
+	1,  // 2: common.LikeUser.user_info:type_name -> common.User
+	1,  // 3: common.Data.user_info:type_name -> common.User
+	5,  // 4: common.Data.token_info:type_name -> common.Token
+	2,  // 5: common.Data.video_list:type_name -> common.Video
+	2,  // 6: common.Data.video_info:type_name -> common.Video
+	1,  // 7: common.Data.user_list:type_name -> common.User
+	3,  // 8: common.Data.comment_info:type_name -> common.Comment
+	3,  // 9: common.Data.comment_list:type_name -> common.Comment
+	6,  // 10: common.Data.mfa_info:type_name -> common.MFA
+	0,  // 11: common.CommonResponse.code:type_name -> common.ErrorCode
+	7,  // 12: common.CommonResponse.data:type_name -> common.Data
+	13, // [13:13] is the sub-list for method output_type
+	13, // [13:13] is the sub-list for method input_type
+	13, // [13:13] is the sub-list for extension type_name
+	13, // [13:13] is the sub-list for extension extendee
+	0,  // [0:13] is the sub-list for field type_name
 }
 
 func init() { file_idl_common_proto_init() }
@@ -612,7 +1074,7 @@ func file_idl_common_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_idl_common_proto_rawDesc), len(file_idl_common_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   7,
+			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

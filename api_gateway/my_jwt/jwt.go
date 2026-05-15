@@ -2,7 +2,7 @@ package my_jwt
 
 import (
 	"context"
-	"errors"
+	"log"
 	"strconv"
 	"time"
 
@@ -79,7 +79,8 @@ func InitJWT() error {
 
 		IdentityHandler: func(ctx context.Context, c *app.RequestContext) interface{} {
 			claims := jwt.ExtractClaims(ctx, c)
-			if permission, ok := claims["permission"].(string); ok {return permission
+			if permission, ok := claims["permission"].(string); ok {
+				return permission
 			}
 			return ""
 		},
@@ -102,15 +103,28 @@ func InitJWT() error {
 	return nil
 }
 
-// GetUserIDFromToken 从 Access Token 中提取用户 ID
 func GetUserIDFromToken(ctx context.Context, c *app.RequestContext) (int64, error) {
 	claims := jwt.ExtractClaims(ctx, c)
-	userID, ok := parseUserID(claims[identityKey])
+	idValue, ok := claims[identityKey]
 	if !ok {
-		return 0, ErrUserIDNotFound
+		return 0, ErrUserIDMissing
+	}
+	userID, ok := parseUserID(idValue)
+	if !ok {
+		return 0, ErrInvalidUserID
 	}
 	return userID, nil
 }
 
-// ErrUserIDNotFound 用户 ID 未找到错误
-var ErrUserIDNotFound = errors.New("user id not found in token")
+func CompareUserID(tokenID int64, userID string) bool {
+	i, err := strconv.ParseInt(userID, 10, 64)
+	if err != nil {
+		log.Println("string to int64 转化失败")
+	}
+	return i == tokenID
+}
+
+var (
+	ErrUserIDMissing = jwt.ErrFailedAuthentication
+	ErrInvalidUserID = jwt.ErrFailedAuthentication
+)

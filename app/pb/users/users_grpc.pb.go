@@ -166,17 +166,13 @@ var UserPublicService_ServiceDesc = grpc.ServiceDesc{
 const (
 	UserAuthService_GetUserInfo_FullMethodName  = "/users.UserAuthService/GetUserInfo"
 	UserAuthService_UploadAvatar_FullMethodName = "/users.UserAuthService/UploadAvatar"
+	UserAuthService_GetMFACode_FullMethodName   = "/users.UserAuthService/GetMFACode"
+	UserAuthService_BindMFA_FullMethodName      = "/users.UserAuthService/BindMFA"
 )
 
 // UserAuthServiceClient is the client API for UserAuthService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-//
-//	message UploadAvatarResponse{
-//	 common.ErrorCode code = 1;
-//	 string message = 2;
-//	 User user_info = 3;
-//	}
 //
 // 用户认证服务
 type UserAuthServiceClient interface {
@@ -184,6 +180,10 @@ type UserAuthServiceClient interface {
 	GetUserInfo(ctx context.Context, in *common.IDRequest, opts ...grpc.CallOption) (*common.CommonResponse, error)
 	// 上传头像
 	UploadAvatar(ctx context.Context, in *UploadAvatarRequest, opts ...grpc.CallOption) (*common.CommonResponse, error)
+	// 获取 MFA 二维码
+	GetMFACode(ctx context.Context, in *GetMFACodeRequest, opts ...grpc.CallOption) (*common.CommonResponse, error)
+	// 绑定 MFA
+	BindMFA(ctx context.Context, in *BindMFARequest, opts ...grpc.CallOption) (*common.CommonResponse, error)
 }
 
 type userAuthServiceClient struct {
@@ -214,15 +214,29 @@ func (c *userAuthServiceClient) UploadAvatar(ctx context.Context, in *UploadAvat
 	return out, nil
 }
 
+func (c *userAuthServiceClient) GetMFACode(ctx context.Context, in *GetMFACodeRequest, opts ...grpc.CallOption) (*common.CommonResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(common.CommonResponse)
+	err := c.cc.Invoke(ctx, UserAuthService_GetMFACode_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userAuthServiceClient) BindMFA(ctx context.Context, in *BindMFARequest, opts ...grpc.CallOption) (*common.CommonResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(common.CommonResponse)
+	err := c.cc.Invoke(ctx, UserAuthService_BindMFA_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserAuthServiceServer is the server API for UserAuthService service.
 // All implementations must embed UnimplementedUserAuthServiceServer
 // for forward compatibility.
-//
-//	message UploadAvatarResponse{
-//	 common.ErrorCode code = 1;
-//	 string message = 2;
-//	 User user_info = 3;
-//	}
 //
 // 用户认证服务
 type UserAuthServiceServer interface {
@@ -230,6 +244,10 @@ type UserAuthServiceServer interface {
 	GetUserInfo(context.Context, *common.IDRequest) (*common.CommonResponse, error)
 	// 上传头像
 	UploadAvatar(context.Context, *UploadAvatarRequest) (*common.CommonResponse, error)
+	// 获取 MFA 二维码
+	GetMFACode(context.Context, *GetMFACodeRequest) (*common.CommonResponse, error)
+	// 绑定 MFA
+	BindMFA(context.Context, *BindMFARequest) (*common.CommonResponse, error)
 	mustEmbedUnimplementedUserAuthServiceServer()
 }
 
@@ -245,6 +263,12 @@ func (UnimplementedUserAuthServiceServer) GetUserInfo(context.Context, *common.I
 }
 func (UnimplementedUserAuthServiceServer) UploadAvatar(context.Context, *UploadAvatarRequest) (*common.CommonResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method UploadAvatar not implemented")
+}
+func (UnimplementedUserAuthServiceServer) GetMFACode(context.Context, *GetMFACodeRequest) (*common.CommonResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetMFACode not implemented")
+}
+func (UnimplementedUserAuthServiceServer) BindMFA(context.Context, *BindMFARequest) (*common.CommonResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method BindMFA not implemented")
 }
 func (UnimplementedUserAuthServiceServer) mustEmbedUnimplementedUserAuthServiceServer() {}
 func (UnimplementedUserAuthServiceServer) testEmbeddedByValue()                         {}
@@ -303,6 +327,42 @@ func _UserAuthService_UploadAvatar_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserAuthService_GetMFACode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMFACodeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserAuthServiceServer).GetMFACode(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserAuthService_GetMFACode_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserAuthServiceServer).GetMFACode(ctx, req.(*GetMFACodeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserAuthService_BindMFA_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BindMFARequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserAuthServiceServer).BindMFA(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserAuthService_BindMFA_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserAuthServiceServer).BindMFA(ctx, req.(*BindMFARequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserAuthService_ServiceDesc is the grpc.ServiceDesc for UserAuthService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -317,6 +377,14 @@ var UserAuthService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UploadAvatar",
 			Handler:    _UserAuthService_UploadAvatar_Handler,
+		},
+		{
+			MethodName: "GetMFACode",
+			Handler:    _UserAuthService_GetMFACode_Handler,
+		},
+		{
+			MethodName: "BindMFA",
+			Handler:    _UserAuthService_BindMFA_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

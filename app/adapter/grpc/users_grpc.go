@@ -3,9 +3,9 @@ package grpc
 import (
 	"context"
 	"errors"
-	"log"
 	"strconv"
 
+	"github.com/ZOEKOFK/video_web_v3/app/domain/model"
 	"github.com/ZOEKOFK/video_web_v3/app/pb/common"
 	"github.com/ZOEKOFK/video_web_v3/app/pb/users"
 	"github.com/ZOEKOFK/video_web_v3/app/usecase"
@@ -48,40 +48,12 @@ func (s *UsersGrpc) Login(ctx context.Context, in *users.UserLoginRequest) (*com
 }
 
 func (s *UsersGrpc) GetUserInfo(ctx context.Context, in *common.IDRequest) (*common.CommonResponse, error) {
-	// ============================================
-	// 从 Metadata 中提取并验证用户 ID 的示例
-	// ============================================
-	
-	// 1️⃣ 从 Metadata 中提取用户 ID
-	userID, err := extractUserIDFromMetadata(ctx)
-	if err == nil {
-		log.Printf("[GetUserInfo] 从 Metadata 中提取到用户 ID: %d", userID)
-		
-		// 2️⃣ 验证用户 ID 有效性
-		_, err = s.userUsecase.ValidateUserID(userID)
-		if err != nil {
-			log.Printf("[GetUserInfo] 用户 ID 验证失败: %v", err)
-			return FailResponse("GetUserInfo", common.ErrorCode_USER_NOT_LOGIN, err), nil
-		}
-		log.Printf("[GetUserInfo] 用户 ID 验证通过")
-	} else {
-		log.Printf("[GetUserInfo] 没有从 Metadata 中提取到用户 ID（这是正常的，公开接口不需要认证）")
-	}
-	
-	// 原有逻辑
 	idStr := in.Id
 	user, err := s.userUsecase.GetUserInfo(idStr)
 	if err != nil {
 		return FailResponse("GetUserInfo", common.ErrorCode_PROGRESS_ERROR, err), nil
 	}
-	pbUser := &common.User{
-		Id:        int64(user.ID),
-		Username:  user.Username,
-		AvatarUrl: user.Avatarurl,
-		Nickname:  user.Nickname,
-		CreatedAt: user.CreatedAt.Format("2006-01-02 15:04:05"),
-		UpdatedAt: user.UpdatedAt.Format("2006-01-02 15:04:05"),
-	}
+	pbUser := model.UserToPb(user)
 	data := &common.Data{
 		UserInfo: pbUser,
 	}
@@ -89,7 +61,15 @@ func (s *UsersGrpc) GetUserInfo(ctx context.Context, in *common.IDRequest) (*com
 }
 
 func (s *UsersGrpc) UploadAvatar(ctx context.Context, in *users.UploadAvatarRequest) (*common.CommonResponse, error) {
-	return &common.CommonResponse{}, nil
+	user, err := s.userUsecase.UploadAvatar(in)
+	if err != nil {
+		return FailResponse("UploadAvatar", common.ErrorCode_PROGRESS_ERROR, err), nil
+	}
+	dto := model.UserToPb(user)
+	data := &common.Data{
+		UserInfo: dto,
+	}
+	return SuccessResponse("UploadAvatar", data), nil
 }
 
 func (s *UsersGrpc) RefreshSession(ctx context.Context, in *users.RefreshTokenRequest) (*common.CommonResponse, error) {
@@ -107,16 +87,45 @@ func (s *UsersGrpc) RefreshSession(ctx context.Context, in *users.RefreshTokenRe
 func (s *UsersGrpc) Logout(ctx context.Context, in *users.RefreshTokenRequest) (*common.CommonResponse, error) {
 	err := s.userUsecase.Logout(in.RefreshToken)
 	if err != nil {
-		
+
 	}
 	return SuccessResponse("Logout", nil), nil
 }
 
-// ============================================
-// Metadata 辅助函数
-// ============================================
+func (s *UsersGrpc) GetMFACode(ctx context.Context, in *users.GetMFACodeRequest) (*common.CommonResponse, error) {
+	userID, err := extractUserIDFromMetadata(ctx)
+	if err != nil {
+		return FailResponse("GetMFACode", common.ErrorCode_USER_NOT_LOGIN, err), nil
+	}
 
-// extractUserIDFromMetadata 从 gRPC Metadata 中提取用户 ID
+	secret, err := s.userUsecase.GetMFACode(uint(userID))
+	if err != nil {
+		return FailResponse("GetMFACode", common.ErrorCode_PROGRESS_ERROR, err), nil
+	}
+
+	mfaInfo := &common.MFA{
+		MfaSecret: secret,
+	}
+	data := &common.Data{
+		MfaInfo: mfaInfo,
+	}
+	return SuccessResponse("GetMFACode", data), nil
+}
+
+func (s *UsersGrpc) BindMFA(ctx context.Context, in *users.BindMFARequest) (*common.CommonResponse, error) {
+	userID, err := extractUserIDFromMetadata(ctx)
+	if err != nil {
+		return FailResponse("BindMFA", common.ErrorCode_USER_NOT_LOGIN, err), nil
+	}
+
+	err = s.userUsecase.BindMFA(uint(userID), in.Code)
+	if err != nil {
+		return FailResponse("BindMFA", common.ErrorCode_PARAM_ERROR, err), nil
+	}
+
+	return SuccessResponse("BindMFA", nil), nil
+}
+
 func extractUserIDFromMetadata(ctx context.Context) (int64, error) {
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
