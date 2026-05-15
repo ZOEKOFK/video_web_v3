@@ -96,3 +96,4 @@ VideoWeb/
      
      
  .\minio.exe server ./data --console-address ":9001"
+ ./consul agent -dev

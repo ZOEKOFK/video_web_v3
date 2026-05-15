@@ -21,6 +21,7 @@ type VideoUseCase interface {
 	GetUserVideos(userID uint, page, pageSize int) ([]*model.Videos, error)
 	SearchVideos(keyword string, page, pageSize int, sort string) ([]*model.Videos, error)
 	GetHotVideos(limit int, videoType string, page int) ([]*model.Videos, error)
+	GetVideoFeed(latestTime int64, pageSize int) ([]*model.Videos, error)
 	IncrementViews(videoID string) error
 	IncrementLikes(videoID string) error
 }
@@ -95,6 +96,11 @@ func (u *videoUsecase) SearchVideos(keyword string, page, pageSize int, sort str
 func (u *videoUsecase) GetHotVideos(limit int, videoType string, page int) ([]*model.Videos, error) {
 	log.Printf("[GetHotVideos] 获取热门视频: limit=%d, type=%s, page=%d", limit, videoType, page)
 	return u.service.GetHotVideos(limit, videoType, page)
+}
+
+func (u *videoUsecase) GetVideoFeed(latestTime int64, pageSize int) ([]*model.Videos, error) {
+	log.Printf("[GetVideoFeed] 获取视频流: latestTime=%d, pageSize=%d", latestTime, pageSize)
+	return u.service.GetVideoFeed(latestTime, pageSize)
 }
 
 func (u *videoUsecase) IncrementViews(videoID string) error {

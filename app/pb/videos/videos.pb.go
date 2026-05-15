@@ -282,6 +282,59 @@ func (x *HotVideoRequest) GetPage() int32 {
 	return 0
 }
 
+// 视频流请求
+type FeedVideoRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	LatestTime    string                 `protobuf:"bytes,1,opt,name=latest_time,json=latestTime,proto3" json:"latest_time,omitempty"` // 可选，13位timestamp，若存在则返回此时间之后的视频流
+	PageSize      int32                  `protobuf:"varint,2,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`      // 每页大小，默认10
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FeedVideoRequest) Reset() {
+	*x = FeedVideoRequest{}
+	mi := &file_idl_videos_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FeedVideoRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FeedVideoRequest) ProtoMessage() {}
+
+func (x *FeedVideoRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_idl_videos_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FeedVideoRequest.ProtoReflect.Descriptor instead.
+func (*FeedVideoRequest) Descriptor() ([]byte, []int) {
+	return file_idl_videos_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *FeedVideoRequest) GetLatestTime() string {
+	if x != nil {
+		return x.LatestTime
+	}
+	return ""
+}
+
+func (x *FeedVideoRequest) GetPageSize() int32 {
+	if x != nil {
+		return x.PageSize
+	}
+	return 0
+}
+
 var File_idl_videos_proto protoreflect.FileDescriptor
 
 const file_idl_videos_proto_rawDesc = "" +
@@ -304,11 +357,16 @@ const file_idl_videos_proto_rawDesc = "" +
 	"\x0fHotVideoRequest\x12\x14\n" +
 	"\x05limit\x18\x01 \x01(\x05R\x05limit\x12\x12\n" +
 	"\x04type\x18\x02 \x01(\tR\x04type\x12\x12\n" +
-	"\x04page\x18\x03 \x01(\x05R\x04page2\xad\x02\n" +
+	"\x04page\x18\x03 \x01(\x05R\x04page\"P\n" +
+	"\x10FeedVideoRequest\x12\x1f\n" +
+	"\vlatest_time\x18\x01 \x01(\tR\n" +
+	"latestTime\x12\x1b\n" +
+	"\tpage_size\x18\x02 \x01(\x05R\bpageSize2\x84\x03\n" +
 	"\x12VideoPublicService\x12Z\n" +
 	"\fSearchVideos\x12\x1a.videos.SearchVideoRequest\x1a\x16.common.CommonResponse\"\x16\xca\xc1\x18\x12/api/videos/search\x12T\n" +
 	"\fGetHotVideos\x12\x17.videos.HotVideoRequest\x1a\x16.common.CommonResponse\"\x13\xca\xc1\x18\x0f/api/videos/hot\x12e\n" +
-	"\rGetUserVideos\x12\x1c.videos.UserVideoListRequest\x1a\x16.common.CommonResponse\"\x1e\xca\xc1\x18\x1a/api/users/:user_id/videos2f\n" +
+	"\rGetUserVideos\x12\x1c.videos.UserVideoListRequest\x1a\x16.common.CommonResponse\"\x1e\xca\xc1\x18\x1a/api/users/:user_id/videos\x12U\n" +
+	"\fGetVideoFeed\x12\x18.videos.FeedVideoRequest\x1a\x16.common.CommonResponse\"\x13\xca\xc1\x18\x0f/api/video/feed2f\n" +
 	"\x10VideoAuthService\x12R\n" +
 	"\vUploadVideo\x12\x1a.videos.UploadVideoRequest\x1a\x16.common.CommonResponse\"\x0f\xd2\xc1\x18\v/api/videosB\tZ\a/videosb\x06proto3"
 
@@ -324,25 +382,28 @@ func file_idl_videos_proto_rawDescGZIP() []byte {
 	return file_idl_videos_proto_rawDescData
 }
 
-var file_idl_videos_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_idl_videos_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_idl_videos_proto_goTypes = []any{
 	(*UploadVideoRequest)(nil),    // 0: videos.UploadVideoRequest
 	(*UserVideoListRequest)(nil),  // 1: videos.UserVideoListRequest
 	(*SearchVideoRequest)(nil),    // 2: videos.SearchVideoRequest
 	(*HotVideoRequest)(nil),       // 3: videos.HotVideoRequest
-	(*common.CommonResponse)(nil), // 4: common.CommonResponse
+	(*FeedVideoRequest)(nil),      // 4: videos.FeedVideoRequest
+	(*common.CommonResponse)(nil), // 5: common.CommonResponse
 }
 var file_idl_videos_proto_depIdxs = []int32{
 	2, // 0: videos.VideoPublicService.SearchVideos:input_type -> videos.SearchVideoRequest
 	3, // 1: videos.VideoPublicService.GetHotVideos:input_type -> videos.HotVideoRequest
 	1, // 2: videos.VideoPublicService.GetUserVideos:input_type -> videos.UserVideoListRequest
-	0, // 3: videos.VideoAuthService.UploadVideo:input_type -> videos.UploadVideoRequest
-	4, // 4: videos.VideoPublicService.SearchVideos:output_type -> common.CommonResponse
-	4, // 5: videos.VideoPublicService.GetHotVideos:output_type -> common.CommonResponse
-	4, // 6: videos.VideoPublicService.GetUserVideos:output_type -> common.CommonResponse
-	4, // 7: videos.VideoAuthService.UploadVideo:output_type -> common.CommonResponse
-	4, // [4:8] is the sub-list for method output_type
-	0, // [0:4] is the sub-list for method input_type
+	4, // 3: videos.VideoPublicService.GetVideoFeed:input_type -> videos.FeedVideoRequest
+	0, // 4: videos.VideoAuthService.UploadVideo:input_type -> videos.UploadVideoRequest
+	5, // 5: videos.VideoPublicService.SearchVideos:output_type -> common.CommonResponse
+	5, // 6: videos.VideoPublicService.GetHotVideos:output_type -> common.CommonResponse
+	5, // 7: videos.VideoPublicService.GetUserVideos:output_type -> common.CommonResponse
+	5, // 8: videos.VideoPublicService.GetVideoFeed:output_type -> common.CommonResponse
+	5, // 9: videos.VideoAuthService.UploadVideo:output_type -> common.CommonResponse
+	5, // [5:10] is the sub-list for method output_type
+	0, // [0:5] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
@@ -359,7 +420,7 @@ func file_idl_videos_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_idl_videos_proto_rawDesc), len(file_idl_videos_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   4,
+			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   2,
 		},

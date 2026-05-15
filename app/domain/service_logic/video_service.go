@@ -129,6 +129,18 @@ func (s *VideosServiceLogic) IncrementLikes(videoID uint) error {
 	return s.repo.Update(video)
 }
 
+func (s *VideosServiceLogic) GetVideoFeed(latestTime int64, pageSize int) ([]*model.Videos, error) {
+	if pageSize <= 0 {
+		pageSize = 10
+	}
+	videos, err := s.repo.GetVideoFeed(latestTime, pageSize)
+	if err != nil {
+		log.Printf("[GetVideoFeed] 获取视频流失败: %v", err)
+		return nil, err
+	}
+	return videos, nil
+}
+
 func trimDot(s string) string {
 	if len(s) > 0 && s[0] == '.' {
 		return s[1:]

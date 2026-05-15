@@ -84,6 +84,21 @@ func (r *VideosRepositoryImpl) GetHotVideos(limit int, videoType string, page in
 	return videos, err
 }
 
+func (r *VideosRepositoryImpl) GetVideoFeed(latestTime int64, pageSize int) ([]*model.Videos, error) {
+	var videos []*model.Videos
+	query := r.db.Order("created_at DESC")
+
+	if latestTime > 0 {
+		latestTimestamp := time.UnixMilli(latestTime)
+		query = query.Where("created_at > ?", latestTimestamp)
+	}
+	if pageSize <= 0 {
+		pageSize = 10
+	}
+	err := query.Limit(pageSize).Find(&videos).Error
+	return videos, err
+}
+
 func (r *VideosRepositoryImpl) Update(video *model.Videos) error {
 	return r.db.Save(video).Error
 }

@@ -7,8 +7,8 @@
 package videos
 
 import (
-	common "github.com/ZOEKOFK/video_web_v3/app/pb/common"
 	context "context"
+	common "github.com/ZOEKOFK/video_web_v3/app/pb/common"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -23,6 +23,7 @@ const (
 	VideoPublicService_SearchVideos_FullMethodName  = "/videos.VideoPublicService/SearchVideos"
 	VideoPublicService_GetHotVideos_FullMethodName  = "/videos.VideoPublicService/GetHotVideos"
 	VideoPublicService_GetUserVideos_FullMethodName = "/videos.VideoPublicService/GetUserVideos"
+	VideoPublicService_GetVideoFeed_FullMethodName  = "/videos.VideoPublicService/GetVideoFeed"
 )
 
 // VideoPublicServiceClient is the client API for VideoPublicService service.
@@ -34,6 +35,7 @@ type VideoPublicServiceClient interface {
 	SearchVideos(ctx context.Context, in *SearchVideoRequest, opts ...grpc.CallOption) (*common.CommonResponse, error)
 	GetHotVideos(ctx context.Context, in *HotVideoRequest, opts ...grpc.CallOption) (*common.CommonResponse, error)
 	GetUserVideos(ctx context.Context, in *UserVideoListRequest, opts ...grpc.CallOption) (*common.CommonResponse, error)
+	GetVideoFeed(ctx context.Context, in *FeedVideoRequest, opts ...grpc.CallOption) (*common.CommonResponse, error)
 }
 
 type videoPublicServiceClient struct {
@@ -74,6 +76,16 @@ func (c *videoPublicServiceClient) GetUserVideos(ctx context.Context, in *UserVi
 	return out, nil
 }
 
+func (c *videoPublicServiceClient) GetVideoFeed(ctx context.Context, in *FeedVideoRequest, opts ...grpc.CallOption) (*common.CommonResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(common.CommonResponse)
+	err := c.cc.Invoke(ctx, VideoPublicService_GetVideoFeed_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // VideoPublicServiceServer is the server API for VideoPublicService service.
 // All implementations must embed UnimplementedVideoPublicServiceServer
 // for forward compatibility.
@@ -83,6 +95,7 @@ type VideoPublicServiceServer interface {
 	SearchVideos(context.Context, *SearchVideoRequest) (*common.CommonResponse, error)
 	GetHotVideos(context.Context, *HotVideoRequest) (*common.CommonResponse, error)
 	GetUserVideos(context.Context, *UserVideoListRequest) (*common.CommonResponse, error)
+	GetVideoFeed(context.Context, *FeedVideoRequest) (*common.CommonResponse, error)
 	mustEmbedUnimplementedVideoPublicServiceServer()
 }
 
@@ -101,6 +114,9 @@ func (UnimplementedVideoPublicServiceServer) GetHotVideos(context.Context, *HotV
 }
 func (UnimplementedVideoPublicServiceServer) GetUserVideos(context.Context, *UserVideoListRequest) (*common.CommonResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetUserVideos not implemented")
+}
+func (UnimplementedVideoPublicServiceServer) GetVideoFeed(context.Context, *FeedVideoRequest) (*common.CommonResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetVideoFeed not implemented")
 }
 func (UnimplementedVideoPublicServiceServer) mustEmbedUnimplementedVideoPublicServiceServer() {}
 func (UnimplementedVideoPublicServiceServer) testEmbeddedByValue()                            {}
@@ -177,6 +193,24 @@ func _VideoPublicService_GetUserVideos_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _VideoPublicService_GetVideoFeed_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FeedVideoRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VideoPublicServiceServer).GetVideoFeed(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VideoPublicService_GetVideoFeed_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VideoPublicServiceServer).GetVideoFeed(ctx, req.(*FeedVideoRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // VideoPublicService_ServiceDesc is the grpc.ServiceDesc for VideoPublicService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -195,6 +229,10 @@ var VideoPublicService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetUserVideos",
 			Handler:    _VideoPublicService_GetUserVideos_Handler,
+		},
+		{
+			MethodName: "GetVideoFeed",
+			Handler:    _VideoPublicService_GetVideoFeed_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

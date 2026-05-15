@@ -9,8 +9,8 @@ import (
 	"strconv"
 
 	"github.com/ZOEKOFK/video_web_v3/api_gateway/client"
-	common "github.com/ZOEKOFK/video_web_v3/app/pb/common"
-	videos "github.com/ZOEKOFK/video_web_v3/app/pb/videos"
+	commonpb "github.com/ZOEKOFK/video_web_v3/app/pb/common"
+	videospb "github.com/ZOEKOFK/video_web_v3/app/pb/videos"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )
@@ -19,11 +19,11 @@ import (
 // @router /api/videos/search [GET]
 func SearchVideos(ctx context.Context, c *app.RequestContext) {
 	var err error
-	var req videos.SearchVideoRequest
+	var req videospb.SearchVideoRequest
 	err = c.Bind(&req)
 	log.Println(req.Page)
 	if err != nil {
-		c.JSON(consts.StatusBadRequest, client.FailResponse("SearchVideo", common.ErrorCode_REQUEST_ERROR))
+		c.JSON(consts.StatusBadRequest, client.FailResponse("SearchVideo", commonpb.ErrorCode_REQUEST_ERROR))
 		return
 	}
 
@@ -39,10 +39,10 @@ func SearchVideos(ctx context.Context, c *app.RequestContext) {
 // @router /api/videos/hot [GET]
 func GetHotVideos(ctx context.Context, c *app.RequestContext) {
 	var err error
-	var req videos.HotVideoRequest
+	var req videospb.HotVideoRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.JSON(consts.StatusBadRequest, client.FailResponse("GetHotVideo", common.ErrorCode_REQUEST_ERROR))
+		c.JSON(consts.StatusBadRequest, client.FailResponse("GetHotVideo", commonpb.ErrorCode_REQUEST_ERROR))
 		return
 	}
 
@@ -59,13 +59,27 @@ func GetHotVideos(ctx context.Context, c *app.RequestContext) {
 func GetUserVideos(ctx context.Context, c *app.RequestContext) {
 	id := c.Param("user_id")
 	var err error
-	var req videos.UserVideoListRequest
+	var req videospb.UserVideoListRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		c.JSON(http.StatusBadRequest, client.FailResponse("GetUserVideos", commonpb.ErrorCode_PARAM_ERROR))
 		return
 	}
 	req.Id, _ = strconv.ParseUint(id, 10, 64)
 	resp, err := client.VideoPublicServiceClient.GetUserVideos(ctx, &req)
+	c.JSON(consts.StatusOK, resp)
+}
+
+// GetVideoFeed .
+// @router /api/video/feed [GET]
+func GetVideoFeed(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req videospb.FeedVideoRequest
+	err = c.Bind(&req)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, client.FailResponse("GetVideoFeed", commonpb.ErrorCode_PARAM_ERROR))
+		return
+	}
+	resp, err := client.VideoPublicServiceClient.GetVideoFeed(ctx, &req)
 	c.JSON(consts.StatusOK, resp)
 }

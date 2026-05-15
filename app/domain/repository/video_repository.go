@@ -8,6 +8,7 @@ type VideosRepository interface {
 	GetByUserID(userID uint, page, pageSize int) ([]*model.Videos, error)
 	Search(keyword string, page, pageSize int, sort string) ([]*model.Videos, error)
 	GetHotVideos(limit int, videoType string, page int) ([]*model.Videos, error)
+	GetVideoFeed(latestTime int64, pageSize int) ([]*model.Videos, error)
 	Update(video *model.Videos) error
 	Delete(id uint) error
 }

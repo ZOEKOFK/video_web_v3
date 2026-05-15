@@ -50,3 +50,13 @@ func _searchvideosMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _videoMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _getvideofeedMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
