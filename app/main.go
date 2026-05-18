@@ -60,6 +60,10 @@ func main() {
 	followService := service_logic.NewFollowServiceLogic(followRepo)
 	socialUseCase := usecase.NewSocialUsecase(followRepo, followService)
 
+	messageRepo := mysql.NewMessageRepository(db)
+	chatCache := redis.NewChatCache()
+	chatUseCase := usecase.NewChatUsecase(messageRepo, chatCache)
+
 	interactionRepo := mysql.NewInteractionRepository(db)
 	interactionUseCase := usecase.NewInteractionUsecase(interactionRepo)
 
@@ -79,7 +83,7 @@ func main() {
 
 	go func() {
 		defer wg.Done()
-		startSocialService(socialUseCase)
+		startSocialService(socialUseCase, chatUseCase)
 	}()
 	go func() {
 		defer wg.Done()
@@ -93,12 +97,13 @@ func startUserService(userUseCase usecase.UserUseCase) {
 		orgin.MaxRecvMsgSize(500*1024*1024),
 		orgin.MaxSendMsgSize(500*1024*1024),
 	)
-
+	//grpc register
 	usersGrpc := grpc.NewUsersGrpc(userUseCase)
 	users.RegisterUserAuthServiceServer(server, usersGrpc)
 	users.RegisterUserPublicServiceServer(server, usersGrpc)
 	users.RegisterSessionServiceServer(server, usersGrpc)
 
+	//consul
 	healthServer := health.NewServer()
 	healthpb.RegisterHealthServer(server, healthServer)
 	healthServer.SetServingStatus("", healthpb.HealthCheckResponse_SERVING)
@@ -184,15 +189,17 @@ func startVideoService(videoUseCase usecase.VideoUseCase) {
 	}
 }
 
-func startSocialService(socialUseCase usecase.SocialUseCase) {
+func startSocialService(socialUseCase usecase.SocialUseCase, chatUseCase usecase.ChatUseCase) {
 	server := orgin.NewServer(
 		orgin.MaxRecvMsgSize(500*1024*1024),
 		orgin.MaxSendMsgSize(500*1024*1024),
 	)
 
 	socialGrpc := grpc.NewSocialGrpc(socialUseCase)
+	chatGrpc := grpc.NewChatGrpc(chatUseCase)
 	socialpb.RegisterFollowAuthServiceServer(server, socialGrpc)
 	socialpb.RegisterFollowPublicServiceServer(server, socialGrpc)
+	socialpb.RegisterChatServiceServer(server, chatGrpc)
 
 	healthServer := health.NewServer()
 	healthpb.RegisterHealthServer(server, healthServer)
@@ -209,6 +216,7 @@ func startSocialService(socialUseCase usecase.SocialUseCase) {
 	fmt.Printf("✅ 社交服务 (Social Service) 正在监听 %s...\n", addr)
 	fmt.Println("   - FollowAuthService")
 	fmt.Println("   - FollowPublicService")
+	fmt.Println("   - ChatService")
 
 	if err := server.Serve(l); err != nil {
 		log.Fatalf("社交 gRPC 服务启动失败: %v", err)

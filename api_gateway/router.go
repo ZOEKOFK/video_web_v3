@@ -3,11 +3,15 @@
 package main
 
 import (
+	"net/http"
+
+	"github.com/ZOEKOFK/video_web_v3/api_gateway/biz/handler/social"
 	"github.com/cloudwego/hertz/pkg/app/server"
+	"github.com/cloudwego/hertz/pkg/common/adaptor"
 )
 
 // customizeRegister registers customize routers.
 func customizedRegister(r *server.Hertz) {
-
-	// your code ...
+	// 注册 WebSocket 端点
+	r.GET("/ws/chat", adaptor.HertzHandler(http.HandlerFunc(social.WsHandler)))
 }

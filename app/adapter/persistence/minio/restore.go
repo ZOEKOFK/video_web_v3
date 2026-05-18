@@ -64,20 +64,3 @@ func Delete(objectName string) error {
 	log.Printf("[MinIO] 删除成功: %s", objectName)
 	return nil
 }
-
-func EnsureBucketExists() error {
-	exists, err := MinioClient.BucketExists(context.Background(), BucketName)
-	if err != nil {
-		return fmt.Errorf("检查 bucket 失败: %w", err)
-	}
-	if !exists {
-		err = MinioClient.MakeBucket(context.Background(), BucketName, minio.MakeBucketOptions{})
-		if err != nil {
-			return fmt.Errorf("创建 bucket 失败: %w", err)
-		}
-		log.Printf("[MinIO] 创建 bucket 成功: %s", BucketName)
-	} else {
-		log.Printf("[MinIO] bucket 已存在: %s", BucketName)
-	}
-	return nil
-}

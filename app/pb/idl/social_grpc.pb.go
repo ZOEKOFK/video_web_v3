@@ -7,7 +7,7 @@
 package social
 
 import (
-	common "github.com/ZOEKOFK/video_web_v3/app/pb/common"
+	common "/common"
 	context "context"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"

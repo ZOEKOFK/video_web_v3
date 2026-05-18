@@ -21,6 +21,12 @@ func Register(r *server.Hertz) {
 		_api := root.Group("/api", _apiMw()...)
 		_api.POST("/follows", append(_followactionMw(), social.FollowAction)...)
 		{
+			_chat := _api.Group("/chat", _chatMw()...)
+			_chat.GET("/history", append(_getchathistoryMw(), social.GetChatHistory)...)
+			_chat.POST("/send", append(_sendmessageMw(), social.SendMessage)...)
+			_chat.GET("/sessions", append(_getchatsessionsMw(), social.GetChatSessions)...)
+		}
+		{
 			_users := _api.Group("/users", _usersMw()...)
 			_users.GET("/friends", append(_getfriendlistMw(), social.GetFriendList)...)
 			{

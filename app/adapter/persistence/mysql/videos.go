@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/ZOEKOFK/video_web_v3/app/domain/model"
+	"github.com/ZOEKOFK/video_web_v3/app/domain/repository"
 	"github.com/jinzhu/gorm"
 )
 
@@ -11,7 +12,7 @@ type VideosRepositoryImpl struct {
 	db *gorm.DB
 }
 
-func NewVideosRepository(db *gorm.DB) *VideosRepositoryImpl {
+func NewVideosRepository(db *gorm.DB) repository.VideosRepository {
 	return &VideosRepositoryImpl{db: db}
 }
 

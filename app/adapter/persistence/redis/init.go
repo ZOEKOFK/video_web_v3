@@ -51,24 +51,6 @@ func SetWithExpiration(key string, value interface{}, expiration time.Duration) 
 	return Client.Set(Ctx, key, value, expiration).Err()
 }
 
-func DeleteByPattern(pattern string) error {
-	if !isConnected {
-		return fmt.Errorf("redis not connected")
-	}
-	iter := Client.Scan(Ctx, 0, pattern, 100).Iterator()
-	var keys []string
-	for iter.Next(Ctx) {
-		keys = append(keys, iter.Val())
-	}
-	if err := iter.Err(); err != nil {
-		return err
-	}
-	if len(keys) > 0 {
-		return Client.Del(Ctx, keys...).Err()
-	}
-	return nil
-}
-
 func Exists(key string) (bool, error) {
 	if !isConnected {
 		return false, fmt.Errorf("redis not connected")

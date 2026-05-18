@@ -126,7 +126,6 @@ func (u *userUsecase) RefreshToken(refreshToken string, remember bool) (*service
 	if err != nil {
 		return nil, err
 	}
-
 	return loginResp, nil
 }
 
@@ -160,11 +159,9 @@ func (u *userUsecase) GetMFACode(userID uint) (secret string, err error) {
 	if err != nil {
 		return "", fmt.Errorf("生成 MFA 密钥失败: %w", err)
 	}
-
 	if err = u.repo.UpdateMfaSecret(userID, key.Secret()); err != nil {
 		return "", fmt.Errorf("保存 MFA 密钥失败: %w", err)
 	}
-
 	log.Printf("[GetMFACode] userID=%d 已生成 MFA 密钥", userID)
 	return key.Secret(), nil
 }

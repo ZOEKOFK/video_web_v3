@@ -4,7 +4,6 @@ package videos
 
 import (
 	"context"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -21,12 +20,11 @@ func SearchVideos(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req videospb.SearchVideoRequest
 	err = c.Bind(&req)
-	log.Println(req.Page)
+	//log.Println(req.Page)
 	if err != nil {
 		c.JSON(consts.StatusBadRequest, client.FailResponse("SearchVideo", commonpb.ErrorCode_REQUEST_ERROR))
 		return
 	}
-
 	resp, err := client.VideoPublicServiceClient.SearchVideos(ctx, &req)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, resp)
