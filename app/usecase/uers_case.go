@@ -50,9 +50,11 @@ func (u *userUsecase) UploadAvatar(request *users.UploadAvatarRequest) (*model.U
 	minioFilePath := "/picture/" + filename
 	SqlFilePath := my_minio.BucketName + filename
 	oldUser, err := u.repo.GetUserInfoByID(request.UserId)
-	err = my_minio.Delete(oldUser.Avatarurl)
-	if err != nil {
-		return nil, err
+	if oldUser.Avatarurl != "" {
+		err = my_minio.Delete(oldUser.Avatarurl)
+		if err != nil {
+			return nil, err
+		}
 	}
 	err = my_minio.Save(minioFilePath, request.File)
 	if err != nil {
