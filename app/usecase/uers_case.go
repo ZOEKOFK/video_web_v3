@@ -48,7 +48,7 @@ func (u *userUsecase) UploadAvatar(request *users.UploadAvatarRequest) (*model.U
 	}
 	filename := fmt.Sprintf("%d_%s%s", time.Now().Unix(), uuid.New().String()[:8], request.FileExtension)
 	minioFilePath := "/picture/" + filename
-	SqlFilePath := my_minio.BucketName + filename
+	SqlFilePath := my_minio.BucketName + "/picture/" + filename
 	oldUser, err := u.repo.GetUserInfoByID(request.UserId)
 	if oldUser.Avatarurl != "" {
 		err = my_minio.Delete(oldUser.Avatarurl)
