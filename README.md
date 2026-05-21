@@ -40,9 +40,22 @@ cd app && go run .
 
 ```
 video_web_v3/
-├── api_gateway/     # API 网关（HTTP 入口）
-├── app/             # 后端应用服务（业务逻辑）
-├── docs/            # 项目文档
-└── README.md
+├── api_gateway/           # API 网关
+│   ├── biz/handler/       # HTTP 处理器
+│   ├── client/            # gRPC 客户端
+│   ├── idl/               # Proto 定义
+│   ├── my_jwt/            # JWT 认证
+│   └── router/            # 路由配置
+└── app/                   # 后端应用
+    ├── adapter/           # 适配器层
+    │   ├── grpc/          # gRPC 服务实现
+    │   ├── persistence/   # 数据持久化
+    │   └── consul/        # 服务发现
+    ├── domain/            # 领域层
+    │   ├── model/         # 数据模型
+    │   ├── repository/    # 仓储接口
+    │   └── service_logic/ # 业务逻辑
+    ├── usecase/           # 用例层
+    └── idl/               # Proto 定义
 ```
 
