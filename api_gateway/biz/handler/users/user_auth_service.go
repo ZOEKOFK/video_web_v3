@@ -26,7 +26,6 @@ func GetUserInfo(ctx context.Context, c *app.RequestContext) {
 	id := c.Param("user_id")
 	req.Id = id
 	//log.Println("id:", id)
-	// 调用 gRPC 微服务获取用户信息
 	grpcResp, err := client.UserAuthServiceClient.GetUserInfo(ctx, &req)
 	if err != nil {
 		log.Printf("GetUserInfo grpc error: %v", err)

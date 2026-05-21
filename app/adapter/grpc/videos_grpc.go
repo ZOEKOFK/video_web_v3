@@ -3,6 +3,7 @@ package grpc
 import (
 	"context"
 	"log"
+	w "strconv"
 
 	"github.com/ZOEKOFK/video_web_v3/app/domain/model"
 	"github.com/ZOEKOFK/video_web_v3/app/pb/common"
@@ -58,6 +59,32 @@ func (s *VideosGrpc) GetUserVideos(ctx context.Context, in *videos.UserVideoList
 		VideoList: model.VideoListToPb(videosList),
 	}
 	return SuccessResponse("GetUserVideos", data), nil
+}
+
+func (s *VideosGrpc) GetVideoFeed(ctx context.Context, in *videos.FeedVideoRequest) (*common.CommonResponse, error) {
+	var latestTime int64
+	if in.LatestTime != "" {
+		parsedTime, err := w.ParseInt(in.LatestTime, 10, 64)
+		if err != nil {
+			return FailResponse("GetVideoFeed", common.ErrorCode_PARAM_ERROR, err), nil
+		}
+		latestTime = parsedTime
+	}
+
+	pageSize := int(in.PageSize)
+	if pageSize <= 0 {
+		pageSize = 10
+	}
+
+	videosList, err := s.videoUsecase.GetVideoFeed(latestTime, pageSize)
+	if err != nil {
+		return FailResponse("GetVideoFeed", common.ErrorCode_PROGRESS_ERROR, err), nil
+	}
+
+	data := &common.Data{
+		VideoList: model.VideoListToPb(videosList),
+	}
+	return SuccessResponse("GetVideoFeed", data), nil
 }
 
 func (s *VideosGrpc) UploadVideo(ctx context.Context, in *videos.UploadVideoRequest) (*common.CommonResponse, error) {

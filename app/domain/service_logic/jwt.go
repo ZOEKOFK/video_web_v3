@@ -186,13 +186,13 @@ func (u *UsersServiceLogic) parseRefreshToken(tokenString string) (int64, string
 	expire := time.Unix(int64(expFloat), 0)
 	return userID, jti, expire, nil
 }
+
 //func (u *UsersServiceLogic) ParseAccessToken(id string) error {
 //
 //}
 
 func (u *UsersServiceLogic) BuildLoginResponse(user *model.Users, remember bool) (*LoginResponse, error) {
 	userID := int64(user.ID)
-
 	pbUser := &common.User{
 		Id:        userID,
 		Username:  user.Username,
@@ -201,7 +201,6 @@ func (u *UsersServiceLogic) BuildLoginResponse(user *model.Users, remember bool)
 		CreatedAt: user.CreatedAt.Format("2006-01-02 15:04:05"),
 		UpdatedAt: user.UpdatedAt.Format("2006-01-02 15:04:05"),
 	}
-
 	accessToken, accessExpire, err := u.GenerateAccessToken(userID)
 	if err != nil {
 		return nil, err

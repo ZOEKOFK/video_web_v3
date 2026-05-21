@@ -27,6 +27,7 @@ var VideoPublicServiceClient videospb.VideoPublicServiceClient
 
 var FollowAuthServiceClient socialpb.FollowAuthServiceClient
 var FollowPublicClient socialpb.FollowPublicServiceClient
+var ChatServiceClient socialpb.ChatServiceClient
 
 var LikeAuthServiceClient interactionpb.LikeAuthServiceClient
 var CommentAuthServiceClient interactionpb.CommentAuthServiceClient
@@ -99,8 +100,8 @@ func initSocialGRPCClient() {
 	}
 
 	FollowAuthServiceClient = socialpb.NewFollowAuthServiceClient(conn)
-	tmp := socialpb.NewFollowPublicServiceClient(conn)
-	FollowPublicClient = tmp
+	FollowPublicClient = socialpb.NewFollowPublicServiceClient(conn)
+	ChatServiceClient = socialpb.NewChatServiceClient(conn)
 
 	log.Printf("✅ 社交 gRPC 客户端已连接到 %s", addr)
 }

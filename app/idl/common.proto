@@ -78,6 +78,25 @@ message MFA {
 }
 
 // 通用数据
+// 聊天消息
+message ChatMessage {
+  int64 id = 1;
+  int64 sender_id = 2;
+  int64 receiver_id = 3;
+  string content = 4;
+  int64 timestamp = 5;
+  int32 type = 6;
+  bool is_ai = 7;
+}
+
+// 聊天会话
+message ChatSession {
+  int64 peer_id = 1;
+  string last_message = 2;
+  int64 last_time = 3;
+  int32 unread_count = 4;
+}
+
 message Data {
   User user_info = 1;
   Token token_info = 2;
@@ -88,6 +107,9 @@ message Data {
   repeated Comment comment_list = 7;
   int32 total_count = 8;
   MFA mfa_info = 9;
+  ChatMessage chat_message = 10;
+  repeated ChatMessage chat_message_list = 11;
+  repeated ChatSession chat_session_list = 12;
 }
 
 // 通用响应

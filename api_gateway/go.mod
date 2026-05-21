@@ -5,6 +5,7 @@ go 1.26
 require (
 	github.com/ZOEKOFK/video_web_v3/app v0.0.0
 	github.com/cloudwego/hertz v0.10.4
+	github.com/gorilla/websocket v1.5.3
 	github.com/hashicorp/consul/api v1.29.4
 	github.com/hertz-contrib/jwt v1.0.4
 	google.golang.org/grpc v1.81.0

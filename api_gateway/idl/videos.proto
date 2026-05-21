@@ -36,6 +36,12 @@ message HotVideoRequest {
   int32 page = 3;         // 页码
 }
 
+// 视频流请求
+message FeedVideoRequest {
+  string latest_time = 1;  // 可选，13位timestamp，若存在则返回此时间之后的视频流
+  int32 page_size = 2;     // 每页大小，默认10
+}
+
 // 视频公共服务
 service VideoPublicService {
   rpc SearchVideos(SearchVideoRequest) returns (common.CommonResponse){
@@ -48,6 +54,10 @@ service VideoPublicService {
 
   rpc GetUserVideos(UserVideoListRequest) returns (common.CommonResponse){
     option (api.get) = "/api/users/:user_id/videos";
+  }
+
+  rpc GetVideoFeed(FeedVideoRequest) returns (common.CommonResponse){
+    option (api.get) = "/api/video/feed";
   }
 }
 

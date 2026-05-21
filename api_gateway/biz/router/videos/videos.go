@@ -19,6 +19,7 @@ func Register(r *server.Hertz) {
 	root := r.Group("/", rootMw()...)
 	{
 		_api := root.Group("/api", _apiMw()...)
+		_api.POST("/videos", append(_uploadvideoMw(), videos.UploadVideo)...)
 		{
 			_users := _api.Group("/users", _usersMw()...)
 			{
@@ -27,9 +28,12 @@ func Register(r *server.Hertz) {
 			}
 		}
 		{
+			_video := _api.Group("/video", _videoMw()...)
+			_video.GET("/feed", append(_getvideofeedMw(), videos.GetVideoFeed)...)
+		}
+		{
 			_videos := _api.Group("/videos", _videosMw()...)
 			_videos.GET("/hot", append(_gethotvideosMw(), videos.GetHotVideos)...)
-			_videos.POST("/", append(_uploadvideoMw(), videos.UploadVideo)...)
 			_videos.GET("/search", append(_searchvideosMw(), videos.SearchVideos)...)
 		}
 	}

@@ -49,6 +49,50 @@ service FollowAuthService {
   }
 }
 
+// 聊天消息类型
+enum MessageType {
+  TEXT = 0;        // 文本消息
+  IMAGE = 1;       // 图片消息
+  AI_RESPONSE = 2; // AI回复
+}
+
+// 发送消息请求
+message SendMessageRequest {
+  int64 sender_id = 1;       // 发送者ID
+  int64 receiver_id = 2;     // 接收者ID (0表示AI)
+  string content = 3;        // 消息内容
+  MessageType type = 4;      // 消息类型
+}
+
+// 获取聊天历史请求
+message GetChatHistoryRequest {
+  int64 user_id = 1;         // 用户ID
+  int64 peer_id = 2;         // 对方用户ID
+  int32 page = 3;            // 页码
+  int32 page_size = 4;       // 每页大小
+}
+
+// 聊天会话请求
+message ChatSessionRequest {
+  int64 user_id = 1;         // 用户ID
+}
+
+// 获取未读消息请求
+message GetUnreadMessagesRequest {
+  int64 user_id = 1;         // 用户ID
+}
+
+// 聊天消息响应
+message ChatMessageResponse {
+  int64 id = 1;
+  int64 sender_id = 2;
+  int64 receiver_id = 3;
+  string content = 4;
+  int64 timestamp = 5;
+  MessageType type = 6;
+  bool is_ai = 7;
+}
+
 // 关注公共服务
 service FollowPublicService {
   // 获取关注列表
@@ -61,5 +105,32 @@ service FollowPublicService {
   // @router /api/users/:user_id/followers [GET]
   rpc GetFollowerList(FollowerListRequest) returns (common.CommonResponse) {
     option (api.get) = "/api/users/:user_id/followers";
+  }
+}
+
+// 聊天服务
+service ChatService {
+  // 发送消息
+  // @router /api/chat/send [POST]
+  rpc SendMessage(SendMessageRequest) returns (common.CommonResponse) {
+    option (api.post) = "/api/chat/send";
+  }
+
+  // 获取聊天历史
+  // @router /api/chat/history [GET]
+  rpc GetChatHistory(GetChatHistoryRequest) returns (common.CommonResponse) {
+    option (api.get) = "/api/chat/history";
+  }
+
+  // 获取聊天会话列表
+  // @router /api/chat/sessions [GET]
+  rpc GetChatSessions(ChatSessionRequest) returns (common.CommonResponse) {
+    option (api.get) = "/api/chat/sessions";
+  }
+
+  // 获取未读消息（用户上线时调用）
+  // @router /api/chat/unread [GET]
+  rpc GetUnreadMessages(GetUnreadMessagesRequest) returns (common.CommonResponse) {
+    option (api.get) = "/api/chat/unread";
   }
 }

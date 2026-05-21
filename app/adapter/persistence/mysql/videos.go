@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/ZOEKOFK/video_web_v3/app/domain/model"
+	"github.com/ZOEKOFK/video_web_v3/app/domain/repository"
 	"github.com/jinzhu/gorm"
 )
 
@@ -11,7 +12,7 @@ type VideosRepositoryImpl struct {
 	db *gorm.DB
 }
 
-func NewVideosRepository(db *gorm.DB) *VideosRepositoryImpl {
+func NewVideosRepository(db *gorm.DB) repository.VideosRepository {
 	return &VideosRepositoryImpl{db: db}
 }
 
@@ -81,6 +82,21 @@ func (r *VideosRepositoryImpl) GetHotVideos(limit int, videoType string, page in
 	}
 
 	err := query.Offset(offset).Limit(limit).Find(&videos).Error
+	return videos, err
+}
+
+func (r *VideosRepositoryImpl) GetVideoFeed(latestTime int64, pageSize int) ([]*model.Videos, error) {
+	var videos []*model.Videos
+	query := r.db.Order("created_at DESC")
+
+	if latestTime > 0 {
+		latestTimestamp := time.UnixMilli(latestTime)
+		query = query.Where("created_at > ?", latestTimestamp)
+	}
+	if pageSize <= 0 {
+		pageSize = 10
+	}
+	err := query.Limit(pageSize).Find(&videos).Error
 	return videos, err
 }
 

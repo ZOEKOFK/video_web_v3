@@ -36,3 +36,23 @@ func _getfollowerlistMw() []app.HandlerFunc {
 func _getfollowlistMw() []app.HandlerFunc {
 	return nil
 }
+
+func _chatMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _getchathistoryMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _sendmessageMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _getchatsessionsMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

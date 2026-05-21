@@ -7,7 +7,8 @@
 package social
 
 import (
-	common "github.com/ZOEKOFK/video_web_v3/app/pb/common"
+	_ "/api"
+	common "/common"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"

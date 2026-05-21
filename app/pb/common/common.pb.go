@@ -545,7 +545,7 @@ func (x *Token) GetRefreshToken() string {
 type MFA struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	MfaSecret     string                 `protobuf:"bytes,1,opt,name=mfa_secret,json=mfaSecret,proto3" json:"mfa_secret,omitempty"`
-	MfaQrcodeUrl  string                 `protobuf:"bytes,2,opt,name=mfa_qrcode_url,json=mfaQrcodeUrl,proto3" json:"mfa_qrcode_url,omitempty"`
+	MfaQrcodeUrl  string                 `protobuf:"bytes,2,opt,name=mfa_qrcode_url,json=mfaQrcodeUrl,proto3" json:"mfa_qrcode_url,omitempty"` //想传也可以
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -595,24 +595,189 @@ func (x *MFA) GetMfaQrcodeUrl() string {
 }
 
 // 通用数据
-type Data struct {
+// 聊天消息
+type ChatMessage struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	UserInfo      *User                  `protobuf:"bytes,1,opt,name=user_info,json=userInfo,proto3" json:"user_info,omitempty"`
-	TokenInfo     *Token                 `protobuf:"bytes,2,opt,name=token_info,json=tokenInfo,proto3" json:"token_info,omitempty"`
-	VideoList     []*Video               `protobuf:"bytes,3,rep,name=video_list,json=videoList,proto3" json:"video_list,omitempty"`
-	VideoInfo     *Video                 `protobuf:"bytes,4,opt,name=video_info,json=videoInfo,proto3" json:"video_info,omitempty"`
-	UserList      []*User                `protobuf:"bytes,5,rep,name=user_list,json=userList,proto3" json:"user_list,omitempty"`
-	CommentInfo   *Comment               `protobuf:"bytes,6,opt,name=comment_info,json=commentInfo,proto3" json:"comment_info,omitempty"`
-	CommentList   []*Comment             `protobuf:"bytes,7,rep,name=comment_list,json=commentList,proto3" json:"comment_list,omitempty"`
-	TotalCount    int32                  `protobuf:"varint,8,opt,name=total_count,json=totalCount,proto3" json:"total_count,omitempty"`
-	MfaInfo       *MFA                   `protobuf:"bytes,9,opt,name=mfa_info,json=mfaInfo,proto3" json:"mfa_info,omitempty"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	SenderId      int64                  `protobuf:"varint,2,opt,name=sender_id,json=senderId,proto3" json:"sender_id,omitempty"`
+	ReceiverId    int64                  `protobuf:"varint,3,opt,name=receiver_id,json=receiverId,proto3" json:"receiver_id,omitempty"`
+	Content       string                 `protobuf:"bytes,4,opt,name=content,proto3" json:"content,omitempty"`
+	Timestamp     int64                  `protobuf:"varint,5,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	Type          int32                  `protobuf:"varint,6,opt,name=type,proto3" json:"type,omitempty"`
+	IsAi          bool                   `protobuf:"varint,7,opt,name=is_ai,json=isAi,proto3" json:"is_ai,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
+func (x *ChatMessage) Reset() {
+	*x = ChatMessage{}
+	mi := &file_idl_common_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ChatMessage) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ChatMessage) ProtoMessage() {}
+
+func (x *ChatMessage) ProtoReflect() protoreflect.Message {
+	mi := &file_idl_common_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ChatMessage.ProtoReflect.Descriptor instead.
+func (*ChatMessage) Descriptor() ([]byte, []int) {
+	return file_idl_common_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *ChatMessage) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *ChatMessage) GetSenderId() int64 {
+	if x != nil {
+		return x.SenderId
+	}
+	return 0
+}
+
+func (x *ChatMessage) GetReceiverId() int64 {
+	if x != nil {
+		return x.ReceiverId
+	}
+	return 0
+}
+
+func (x *ChatMessage) GetContent() string {
+	if x != nil {
+		return x.Content
+	}
+	return ""
+}
+
+func (x *ChatMessage) GetTimestamp() int64 {
+	if x != nil {
+		return x.Timestamp
+	}
+	return 0
+}
+
+func (x *ChatMessage) GetType() int32 {
+	if x != nil {
+		return x.Type
+	}
+	return 0
+}
+
+func (x *ChatMessage) GetIsAi() bool {
+	if x != nil {
+		return x.IsAi
+	}
+	return false
+}
+
+// 聊天会话
+type ChatSession struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PeerId        int64                  `protobuf:"varint,1,opt,name=peer_id,json=peerId,proto3" json:"peer_id,omitempty"`
+	LastMessage   string                 `protobuf:"bytes,2,opt,name=last_message,json=lastMessage,proto3" json:"last_message,omitempty"`
+	LastTime      int64                  `protobuf:"varint,3,opt,name=last_time,json=lastTime,proto3" json:"last_time,omitempty"`
+	UnreadCount   int32                  `protobuf:"varint,4,opt,name=unread_count,json=unreadCount,proto3" json:"unread_count,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ChatSession) Reset() {
+	*x = ChatSession{}
+	mi := &file_idl_common_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ChatSession) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ChatSession) ProtoMessage() {}
+
+func (x *ChatSession) ProtoReflect() protoreflect.Message {
+	mi := &file_idl_common_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ChatSession.ProtoReflect.Descriptor instead.
+func (*ChatSession) Descriptor() ([]byte, []int) {
+	return file_idl_common_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *ChatSession) GetPeerId() int64 {
+	if x != nil {
+		return x.PeerId
+	}
+	return 0
+}
+
+func (x *ChatSession) GetLastMessage() string {
+	if x != nil {
+		return x.LastMessage
+	}
+	return ""
+}
+
+func (x *ChatSession) GetLastTime() int64 {
+	if x != nil {
+		return x.LastTime
+	}
+	return 0
+}
+
+func (x *ChatSession) GetUnreadCount() int32 {
+	if x != nil {
+		return x.UnreadCount
+	}
+	return 0
+}
+
+type Data struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	UserInfo        *User                  `protobuf:"bytes,1,opt,name=user_info,json=userInfo,proto3" json:"user_info,omitempty"`
+	TokenInfo       *Token                 `protobuf:"bytes,2,opt,name=token_info,json=tokenInfo,proto3" json:"token_info,omitempty"`
+	VideoList       []*Video               `protobuf:"bytes,3,rep,name=video_list,json=videoList,proto3" json:"video_list,omitempty"`
+	VideoInfo       *Video                 `protobuf:"bytes,4,opt,name=video_info,json=videoInfo,proto3" json:"video_info,omitempty"`
+	UserList        []*User                `protobuf:"bytes,5,rep,name=user_list,json=userList,proto3" json:"user_list,omitempty"`
+	CommentInfo     *Comment               `protobuf:"bytes,6,opt,name=comment_info,json=commentInfo,proto3" json:"comment_info,omitempty"`
+	CommentList     []*Comment             `protobuf:"bytes,7,rep,name=comment_list,json=commentList,proto3" json:"comment_list,omitempty"`
+	TotalCount      int32                  `protobuf:"varint,8,opt,name=total_count,json=totalCount,proto3" json:"total_count,omitempty"`
+	MfaInfo         *MFA                   `protobuf:"bytes,9,opt,name=mfa_info,json=mfaInfo,proto3" json:"mfa_info,omitempty"`
+	ChatMessage     *ChatMessage           `protobuf:"bytes,10,opt,name=chat_message,json=chatMessage,proto3" json:"chat_message,omitempty"`
+	ChatMessageList []*ChatMessage         `protobuf:"bytes,11,rep,name=chat_message_list,json=chatMessageList,proto3" json:"chat_message_list,omitempty"`
+	ChatSessionList []*ChatSession         `protobuf:"bytes,12,rep,name=chat_session_list,json=chatSessionList,proto3" json:"chat_session_list,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
 func (x *Data) Reset() {
 	*x = Data{}
-	mi := &file_idl_common_proto_msgTypes[6]
+	mi := &file_idl_common_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -624,7 +789,7 @@ func (x *Data) String() string {
 func (*Data) ProtoMessage() {}
 
 func (x *Data) ProtoReflect() protoreflect.Message {
-	mi := &file_idl_common_proto_msgTypes[6]
+	mi := &file_idl_common_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -637,7 +802,7 @@ func (x *Data) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Data.ProtoReflect.Descriptor instead.
 func (*Data) Descriptor() ([]byte, []int) {
-	return file_idl_common_proto_rawDescGZIP(), []int{6}
+	return file_idl_common_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *Data) GetUserInfo() *User {
@@ -703,6 +868,27 @@ func (x *Data) GetMfaInfo() *MFA {
 	return nil
 }
 
+func (x *Data) GetChatMessage() *ChatMessage {
+	if x != nil {
+		return x.ChatMessage
+	}
+	return nil
+}
+
+func (x *Data) GetChatMessageList() []*ChatMessage {
+	if x != nil {
+		return x.ChatMessageList
+	}
+	return nil
+}
+
+func (x *Data) GetChatSessionList() []*ChatSession {
+	if x != nil {
+		return x.ChatSessionList
+	}
+	return nil
+}
+
 // 通用响应
 type CommonResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -715,7 +901,7 @@ type CommonResponse struct {
 
 func (x *CommonResponse) Reset() {
 	*x = CommonResponse{}
-	mi := &file_idl_common_proto_msgTypes[7]
+	mi := &file_idl_common_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -727,7 +913,7 @@ func (x *CommonResponse) String() string {
 func (*CommonResponse) ProtoMessage() {}
 
 func (x *CommonResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_idl_common_proto_msgTypes[7]
+	mi := &file_idl_common_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -740,7 +926,7 @@ func (x *CommonResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CommonResponse.ProtoReflect.Descriptor instead.
 func (*CommonResponse) Descriptor() ([]byte, []int) {
-	return file_idl_common_proto_rawDescGZIP(), []int{7}
+	return file_idl_common_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *CommonResponse) GetCode() ErrorCode {
@@ -775,7 +961,7 @@ type Pagination struct {
 
 func (x *Pagination) Reset() {
 	*x = Pagination{}
-	mi := &file_idl_common_proto_msgTypes[8]
+	mi := &file_idl_common_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -787,7 +973,7 @@ func (x *Pagination) String() string {
 func (*Pagination) ProtoMessage() {}
 
 func (x *Pagination) ProtoReflect() protoreflect.Message {
-	mi := &file_idl_common_proto_msgTypes[8]
+	mi := &file_idl_common_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -800,7 +986,7 @@ func (x *Pagination) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Pagination.ProtoReflect.Descriptor instead.
 func (*Pagination) Descriptor() ([]byte, []int) {
-	return file_idl_common_proto_rawDescGZIP(), []int{8}
+	return file_idl_common_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *Pagination) GetPage() int32 {
@@ -827,7 +1013,7 @@ type IDRequest struct {
 
 func (x *IDRequest) Reset() {
 	*x = IDRequest{}
-	mi := &file_idl_common_proto_msgTypes[9]
+	mi := &file_idl_common_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -839,7 +1025,7 @@ func (x *IDRequest) String() string {
 func (*IDRequest) ProtoMessage() {}
 
 func (x *IDRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_idl_common_proto_msgTypes[9]
+	mi := &file_idl_common_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -852,7 +1038,7 @@ func (x *IDRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use IDRequest.ProtoReflect.Descriptor instead.
 func (*IDRequest) Descriptor() ([]byte, []int) {
-	return file_idl_common_proto_rawDescGZIP(), []int{9}
+	return file_idl_common_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *IDRequest) GetId() string {
@@ -873,7 +1059,7 @@ type FileUploadRequest struct {
 
 func (x *FileUploadRequest) Reset() {
 	*x = FileUploadRequest{}
-	mi := &file_idl_common_proto_msgTypes[10]
+	mi := &file_idl_common_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -885,7 +1071,7 @@ func (x *FileUploadRequest) String() string {
 func (*FileUploadRequest) ProtoMessage() {}
 
 func (x *FileUploadRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_idl_common_proto_msgTypes[10]
+	mi := &file_idl_common_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -898,7 +1084,7 @@ func (x *FileUploadRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FileUploadRequest.ProtoReflect.Descriptor instead.
 func (*FileUploadRequest) Descriptor() ([]byte, []int) {
-	return file_idl_common_proto_rawDescGZIP(), []int{10}
+	return file_idl_common_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *FileUploadRequest) GetFileKey() string {
@@ -970,7 +1156,21 @@ const file_idl_common_proto_rawDesc = "" +
 	"\x03MFA\x12\x1d\n" +
 	"\n" +
 	"mfa_secret\x18\x01 \x01(\tR\tmfaSecret\x12$\n" +
-	"\x0emfa_qrcode_url\x18\x02 \x01(\tR\fmfaQrcodeUrl\"\x97\x03\n" +
+	"\x0emfa_qrcode_url\x18\x02 \x01(\tR\fmfaQrcodeUrl\"\xbc\x01\n" +
+	"\vChatMessage\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x1b\n" +
+	"\tsender_id\x18\x02 \x01(\x03R\bsenderId\x12\x1f\n" +
+	"\vreceiver_id\x18\x03 \x01(\x03R\n" +
+	"receiverId\x12\x18\n" +
+	"\acontent\x18\x04 \x01(\tR\acontent\x12\x1c\n" +
+	"\ttimestamp\x18\x05 \x01(\x03R\ttimestamp\x12\x12\n" +
+	"\x04type\x18\x06 \x01(\x05R\x04type\x12\x13\n" +
+	"\x05is_ai\x18\a \x01(\bR\x04isAi\"\x89\x01\n" +
+	"\vChatSession\x12\x17\n" +
+	"\apeer_id\x18\x01 \x01(\x03R\x06peerId\x12!\n" +
+	"\flast_message\x18\x02 \x01(\tR\vlastMessage\x12\x1b\n" +
+	"\tlast_time\x18\x03 \x01(\x03R\blastTime\x12!\n" +
+	"\funread_count\x18\x04 \x01(\x05R\vunreadCount\"\xd1\x04\n" +
 	"\x04Data\x12)\n" +
 	"\tuser_info\x18\x01 \x01(\v2\f.common.UserR\buserInfo\x12,\n" +
 	"\n" +
@@ -984,7 +1184,11 @@ const file_idl_common_proto_rawDesc = "" +
 	"\fcomment_list\x18\a \x03(\v2\x0f.common.CommentR\vcommentList\x12\x1f\n" +
 	"\vtotal_count\x18\b \x01(\x05R\n" +
 	"totalCount\x12&\n" +
-	"\bmfa_info\x18\t \x01(\v2\v.common.MFAR\amfaInfo\"s\n" +
+	"\bmfa_info\x18\t \x01(\v2\v.common.MFAR\amfaInfo\x126\n" +
+	"\fchat_message\x18\n" +
+	" \x01(\v2\x13.common.ChatMessageR\vchatMessage\x12?\n" +
+	"\x11chat_message_list\x18\v \x03(\v2\x13.common.ChatMessageR\x0fchatMessageList\x12?\n" +
+	"\x11chat_session_list\x18\f \x03(\v2\x13.common.ChatSessionR\x0fchatSessionList\"s\n" +
 	"\x0eCommonResponse\x12%\n" +
 	"\x04code\x18\x01 \x01(\x0e2\x11.common.ErrorCodeR\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12 \n" +
@@ -1027,7 +1231,7 @@ func file_idl_common_proto_rawDescGZIP() []byte {
 }
 
 var file_idl_common_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_idl_common_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
+var file_idl_common_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
 var file_idl_common_proto_goTypes = []any{
 	(ErrorCode)(0),            // 0: common.ErrorCode
 	(*User)(nil),              // 1: common.User
@@ -1036,11 +1240,13 @@ var file_idl_common_proto_goTypes = []any{
 	(*LikeUser)(nil),          // 4: common.LikeUser
 	(*Token)(nil),             // 5: common.Token
 	(*MFA)(nil),               // 6: common.MFA
-	(*Data)(nil),              // 7: common.Data
-	(*CommonResponse)(nil),    // 8: common.CommonResponse
-	(*Pagination)(nil),        // 9: common.Pagination
-	(*IDRequest)(nil),         // 10: common.IDRequest
-	(*FileUploadRequest)(nil), // 11: common.FileUploadRequest
+	(*ChatMessage)(nil),       // 7: common.ChatMessage
+	(*ChatSession)(nil),       // 8: common.ChatSession
+	(*Data)(nil),              // 9: common.Data
+	(*CommonResponse)(nil),    // 10: common.CommonResponse
+	(*Pagination)(nil),        // 11: common.Pagination
+	(*IDRequest)(nil),         // 12: common.IDRequest
+	(*FileUploadRequest)(nil), // 13: common.FileUploadRequest
 }
 var file_idl_common_proto_depIdxs = []int32{
 	1,  // 0: common.Comment.user_info:type_name -> common.User
@@ -1054,13 +1260,16 @@ var file_idl_common_proto_depIdxs = []int32{
 	3,  // 8: common.Data.comment_info:type_name -> common.Comment
 	3,  // 9: common.Data.comment_list:type_name -> common.Comment
 	6,  // 10: common.Data.mfa_info:type_name -> common.MFA
-	0,  // 11: common.CommonResponse.code:type_name -> common.ErrorCode
-	7,  // 12: common.CommonResponse.data:type_name -> common.Data
-	13, // [13:13] is the sub-list for method output_type
-	13, // [13:13] is the sub-list for method input_type
-	13, // [13:13] is the sub-list for extension type_name
-	13, // [13:13] is the sub-list for extension extendee
-	0,  // [0:13] is the sub-list for field type_name
+	7,  // 11: common.Data.chat_message:type_name -> common.ChatMessage
+	7,  // 12: common.Data.chat_message_list:type_name -> common.ChatMessage
+	8,  // 13: common.Data.chat_session_list:type_name -> common.ChatSession
+	0,  // 14: common.CommonResponse.code:type_name -> common.ErrorCode
+	9,  // 15: common.CommonResponse.data:type_name -> common.Data
+	16, // [16:16] is the sub-list for method output_type
+	16, // [16:16] is the sub-list for method input_type
+	16, // [16:16] is the sub-list for extension type_name
+	16, // [16:16] is the sub-list for extension extendee
+	0,  // [0:16] is the sub-list for field type_name
 }
 
 func init() { file_idl_common_proto_init() }
@@ -1074,7 +1283,7 @@ func file_idl_common_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_idl_common_proto_rawDesc), len(file_idl_common_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   11,
+			NumMessages:   13,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

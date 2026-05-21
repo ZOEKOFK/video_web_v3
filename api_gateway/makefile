@@ -17,7 +17,7 @@ init:
 update-common:
 	hz update \
 	--mod=$(MOD_NAME) \
-	--idl=$(IDL_DIR)/users.proto \
+	--idl=$(IDL_DIR)/social.proto \
 	--out_dir=$(OUT_DIR) \
 	--proto_path=.
 

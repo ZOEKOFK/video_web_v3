@@ -2,6 +2,7 @@ package mysql
 
 import (
 	"github.com/ZOEKOFK/video_web_v3/app/domain/model"
+	"github.com/ZOEKOFK/video_web_v3/app/domain/repository"
 	"github.com/jinzhu/gorm"
 )
 
@@ -9,7 +10,7 @@ type InteractionRepositoryImpl struct {
 	db *gorm.DB
 }
 
-func NewInteractionRepository(db *gorm.DB) *InteractionRepositoryImpl {
+func NewInteractionRepository(db *gorm.DB) repository.InteractionRepository {
 	return &InteractionRepositoryImpl{db: db}
 }
 

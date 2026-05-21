@@ -128,3 +128,20 @@ var (
 	ErrUserIDMissing = jwt.ErrFailedAuthentication
 	ErrInvalidUserID = jwt.ErrFailedAuthentication
 )
+
+func GetUserIDFromTokenString(tokenString string) (uint64, error) {
+	token, _ := AuthMiddleware.ParseTokenString(tokenString)
+	claims := jwt.ExtractClaimsFromToken(token)
+	if claims == nil {
+		return 0, ErrInvalidUserID
+	}
+	idValue, ok := claims[identityKey]
+	if !ok {
+		return 0, ErrUserIDMissing
+	}
+	userID, ok := parseUserID(idValue)
+	if !ok {
+		return 0, ErrInvalidUserID
+	}
+	return uint64(userID), nil
+}

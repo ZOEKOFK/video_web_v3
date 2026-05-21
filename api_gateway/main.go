@@ -21,5 +21,6 @@ func main() {
 
 	h := server.Default(server.WithHostPorts(":8888"), server.WithMaxRequestBodySize(500*1024*1024))
 	router.GeneratedRegister(h)
+	customizedRegister(h)
 	h.Spin()
 }

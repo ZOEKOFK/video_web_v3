@@ -2,6 +2,7 @@ package mysql
 
 import (
 	"github.com/ZOEKOFK/video_web_v3/app/domain/model"
+	"github.com/ZOEKOFK/video_web_v3/app/domain/repository"
 	"github.com/jinzhu/gorm"
 )
 
@@ -9,7 +10,7 @@ type FollowRepositoryImpl struct {
 	db *gorm.DB
 }
 
-func NewFollowRepository(db *gorm.DB) *FollowRepositoryImpl {
+func NewFollowRepository(db *gorm.DB) repository.FollowRepository {
 	return &FollowRepositoryImpl{db: db}
 }
 
