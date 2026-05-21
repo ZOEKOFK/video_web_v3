@@ -11,6 +11,7 @@ import (
 
 	"github.com/ZOEKOFK/video_web_v3/api_gateway/client"
 	"github.com/ZOEKOFK/video_web_v3/api_gateway/my_jwt"
+	"github.com/ZOEKOFK/video_web_v3/app/adapter/ai" // AI适配器
 	commonpb "github.com/ZOEKOFK/video_web_v3/app/pb/common"
 	socialpb "github.com/ZOEKOFK/video_web_v3/app/pb/social"
 	"github.com/gorilla/websocket"
@@ -30,6 +31,8 @@ var upgrader = websocket.Upgrader{
 		return true
 	},
 }
+
+var ChatAgent *ai.ChatAgent // AI聊天代理（全局单例）
 
 type ChatWSClient struct {
 	conn       *websocket.Conn
@@ -150,6 +153,22 @@ func (c *ChatWSClient) WritePump() {
 	}
 }
 
+func InitializeChatAI(apiKey string) {
+
+	if apiKey == "" {
+		log.Println("[AI] API Key为空，跳过AI初始化")
+		return
+	}
+
+	ChatAgent = ai.InitializeAgent(apiKey, HandleAIResponse)
+
+	if ChatAgent != nil {
+		log.Println("✅ [AI] 聊天AI功能已启用！")
+	} else {
+		log.Println("⚠️ [AI] 聊天AI功能未启用")
+	}
+}
+
 func (c *ChatWSClient) write(messageType int, data []byte) error {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
@@ -230,12 +249,23 @@ func (c *ChatWSClient) handleChatMessage(wsMsg *WSMessage) {
 
 	if peerClient, ok := chatClients.Load(wsMsg.ReceiverID); ok {
 		peerWS := peerClient.(*ChatWSClient)
-		// 在转发前设置正确的发送者ID
 		wsMsg.SenderID = c.userID
 		peerWS.sendMessage(wsMsg)
 		log.Printf("[WS] Message from user %d to user %d delivered", c.userID, wsMsg.ReceiverID)
 	} else {
 		log.Printf("[WS] User %d is offline, message stored in DB", wsMsg.ReceiverID)
+	}
+
+	if ChatAgent != nil {
+		aiMessage := &ai.ChatMessageDTO{
+			SenderID:   c.userID,
+			ReceiverID: wsMsg.ReceiverID,
+			Content:    wsMsg.Content,
+			Timestamp:  time.Now().Unix(),
+			Type:       0,
+			IsAI:       false,
+		}
+		go ChatAgent.OnMessageReceived(aiMessage)
 	}
 }
 
@@ -332,4 +362,69 @@ func WsHandler(w http.ResponseWriter, r *http.Request) {
 	go ws.WritePump()
 	go ws.pushUnreadMessages()
 	ws.ReadPump()
+}
+
+func HandleAIResponse(response *ai.AIResponse) {
+
+	if response == nil || response.Content == "" {
+		return
+	}
+
+	ctx := context.Background()
+
+	req := &socialpb.SendMessageRequest{
+		SenderId:   int64(response.SenderID),
+		ReceiverId: int64(response.ReceiverID),
+		Content:    response.Content,
+		Type:       0,
+	}
+
+	resp, err := client.ChatServiceClient.SendMessage(ctx, req)
+	if err != nil {
+		log.Printf("[AI-WS] 存储AI回复失败: %v", err)
+		return
+	}
+
+	if resp.Code != commonpb.ErrorCode_SUCCESS {
+		log.Printf("[AI-WS] 存储AI回复错误: %s", resp.Message)
+		return
+	}
+
+	log.Printf("[AI-WS] AI回复已存储: Sender=%d, Receiver=%d", response.SenderID, response.ReceiverID)
+
+	wsMsg := &WSMessage{
+		Type:       "message",
+		SenderID:   response.SenderID,
+		ReceiverID: response.ReceiverID,
+		Content:    response.Content,
+		Timestamp:  time.Now().Unix(),
+	}
+
+	targets := []uint64{response.ReceiverID}
+	if len(response.Messages) > 0 {
+		originalSender := response.Messages[0].SenderID
+		if originalSender != response.SenderID && originalSender != response.ReceiverID {
+			found := false
+			for _, id := range targets {
+				if id == originalSender {
+					found = true
+					break
+				}
+			}
+			if !found {
+				targets = append(targets, originalSender)
+			}
+		}
+	}
+
+	for _, targetID := range targets {
+		if client, ok := chatClients.Load(targetID); ok {
+			wsClient := client.(*ChatWSClient)
+			wsMsgCopy := *wsMsg
+			wsClient.sendMessage(&wsMsgCopy)
+			log.Printf("[AI-WS] AI回复已推送给用户 %d", targetID)
+		} else {
+			log.Printf("[AI-WS] 用户 %d 离线，消息已存库", targetID)
+		}
+	}
 }

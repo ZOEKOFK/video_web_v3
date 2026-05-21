@@ -300,7 +300,7 @@ func (x *BindMFARequest) GetCode() string {
 
 type RefreshTokenRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	RefreshToken  string                 `protobuf:"bytes,1,opt,name=refresh_token,json=refreshToken,proto3" json:"refresh_token,omitempty"`
+	RefreshToken  string                 `protobuf:"bytes,1,opt,name=refresh_token" json:"refresh_token,omitempty"`
 	Remember      bool                   `protobuf:"varint,2,opt,name=remember,proto3" json:"remember,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache

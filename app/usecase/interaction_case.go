@@ -103,6 +103,9 @@ func (u *interactionUsecase) LikeAction(userID, targetID uint, likeType int, sta
 	if userID == 0 {
 		return errors.New("user not login")
 	}
+	if userID == targetID {
+		return errors.New("cannot like yourself")
+	}
 	if likeType != 1 && likeType != 2 {
 		return errors.New("invalid like type")
 	}

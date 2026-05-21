@@ -15,7 +15,7 @@ import (
 // @router /api/sessions/refresh [POST]
 func RefreshSession(ctx context.Context, c *app.RequestContext) {
 	var req userspb.RefreshTokenRequest
-	err := c.BindJSON(&req)
+	err := c.Bind(&req)
 	if err != nil {
 		log.Println("[RefreshSession] 绑定请求失败:", err)
 		c.JSON(consts.StatusOK, client.FailResponse("Invalid request", common.ErrorCode_PARAM_ERROR))

@@ -94,9 +94,9 @@ func (x *UploadVideoRequest) GetFileExtension() string {
 // 用户视频列表请求
 type UserVideoListRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Page          int32                  `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`                         // 页码
-	PageSize      int32                  `protobuf:"varint,2,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"` // 每页大小
-	Id            uint64                 `protobuf:"varint,3,opt,name=id,proto3" json:"id,omitempty"`
+	Page          int32                  `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty" query:"page"`                         // 页码
+	PageSize      int32                  `protobuf:"varint,2,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty" query:"page"` // 每页大小
+	Id            uint64                 `protobuf:"varint,3,opt,name=id,proto3" json:"id,omitempty" query:"id"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -155,10 +155,10 @@ func (x *UserVideoListRequest) GetId() uint64 {
 // 搜索视频请求
 type SearchVideoRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Keyword       string                 `protobuf:"bytes,1,opt,name=keyword,proto3" json:"keyword,omitempty"`                    // 关键词
-	Page          int32                  `protobuf:"varint,2,opt,name=page,proto3" json:"page,omitempty"`                         // 页码
-	PageSize      int32                  `protobuf:"varint,3,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"` // 每页大小
-	Sort          string                 `protobuf:"bytes,4,opt,name=sort,proto3" json:"sort,omitempty"`                          // 排序方式
+	Keyword       string                 `protobuf:"bytes,1,opt,name=keyword,proto3" json:"keyword,omitempty" query:"keyword"`                      // 关键词
+	Page          int32                  `protobuf:"varint,2,opt,name=page,proto3" json:"page,omitempty" query:"page"`                              // 页码
+	PageSize      int32                  `protobuf:"varint,3,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty" query:"page_size"` // 每页大小
+	Sort          string                 `protobuf:"bytes,4,opt,name=sort,proto3" json:"sort,omitempty" query:"sort"`                               // 排序方式
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -224,9 +224,9 @@ func (x *SearchVideoRequest) GetSort() string {
 // 热门视频请求
 type HotVideoRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Limit         int32                  `protobuf:"varint,1,opt,name=limit,proto3" json:"limit,omitempty"` // 数量限制
-	Type          string                 `protobuf:"bytes,2,opt,name=type,proto3" json:"type,omitempty"`    // 类型
-	Page          int32                  `protobuf:"varint,3,opt,name=page,proto3" json:"page,omitempty"`   // 页码
+	Limit         int32                  `protobuf:"varint,1,opt,name=limit,proto3" json:"limit,omitempty" query:"limit"` // 数量限制
+	Type          string                 `protobuf:"bytes,2,opt,name=type,proto3" json:"type,omitempty" query:"type"`     // 类型
+	Page          int32                  `protobuf:"varint,3,opt,name=page,proto3" json:"page,omitempty" query:"page" `   // 页码
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -285,8 +285,8 @@ func (x *HotVideoRequest) GetPage() int32 {
 // 视频流请求
 type FeedVideoRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	LatestTime    string                 `protobuf:"bytes,1,opt,name=latest_time,json=latestTime,proto3" json:"latest_time,omitempty"` // 可选，13位timestamp，若存在则返回此时间之后的视频流
-	PageSize      int32                  `protobuf:"varint,2,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`      // 每页大小，默认10
+	LatestTime    string                 `protobuf:"bytes,1,opt,name=latest_time,json=latestTime,proto3" json:"latest_time,omitempty" query:"latest_time"` // 可选，13位timestamp，若存在则返回此时间之后的视频流
+	PageSize      int32                  `protobuf:"varint,2,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty" query:"page_size"`        // 每页大小，默认10
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
