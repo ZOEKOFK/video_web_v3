@@ -3,95 +3,24 @@ package social
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
-	"sync"
 	"time"
 
 	"github.com/ZOEKOFK/video_web_v3/api_gateway/client"
 	"github.com/ZOEKOFK/video_web_v3/api_gateway/my_jwt"
-	"github.com/ZOEKOFK/video_web_v3/app/adapter/ai" // AI适配器
 	commonpb "github.com/ZOEKOFK/video_web_v3/app/pb/common"
 	socialpb "github.com/ZOEKOFK/video_web_v3/app/pb/social"
 	"github.com/gorilla/websocket"
 )
 
-const (
-	writeWait      = 10 * time.Second
-	pongWait       = 60 * time.Second
-	pingPeriod     = (pongWait * 9) / 10
-	maxMessageSize = 512
-)
-
-var upgrader = websocket.Upgrader{
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
-	CheckOrigin: func(r *http.Request) bool {
-		return true
-	},
-}
-
-var ChatAgent *ai.ChatAgent // AI聊天代理（全局单例）
-
-type ChatWSClient struct {
-	conn       *websocket.Conn
-	userID     uint64
-	send       chan []byte
-	mutex      sync.Mutex
-	closed     bool
-	lastActive time.Time
-}
-
-type WSMessage struct {
-	Type       string `json:"type"`
-	SenderID   uint64 `json:"sender_id"`
-	ReceiverID uint64 `json:"receiver_id"`
-	Content    string `json:"content"`
-	Timestamp  int64  `json:"timestamp"`
-}
-
-type WSResponse struct {
-	Type    string      `json:"type"`
-	Code    int         `json:"code"`
-	Message string      `json:"message"`
-	Data    interface{} `json:"data"`
-}
-
-var chatClients sync.Map
-var onlineCount int64
-var countMutex sync.RWMutex
-
-func incrementOnline() {
-	countMutex.Lock()
-	defer countMutex.Unlock()
-	onlineCount++
-}
-
-func decrementOnline() {
-	countMutex.Lock()
-	defer countMutex.Unlock()
-	onlineCount--
-}
-
-func GetOnlineCount() int64 {
-	countMutex.RLock()
-	defer countMutex.RUnlock()
-	return onlineCount
-}
-
-func IsUserOnline(userID uint64) bool {
-	_, ok := chatClients.Load(userID)
-	return ok
-}
-
+// ReadPump 从客户端读入消息，配置连接参数，持续接收消息
 func (c *ChatWSClient) ReadPump() {
 	defer func() {
-		chatClients.Delete(c.userID)
-		decrementOnline()
+		UnregisterClient(c.userID)
 		c.Close()
-		log.Printf("[WS] User %d disconnected, online: %d", c.userID, GetOnlineCount())
 	}()
+
 	c.conn.SetReadLimit(maxMessageSize)
 	c.conn.SetReadDeadline(time.Now().Add(pongWait))
 	c.conn.SetPongHandler(func(string) error {
@@ -113,6 +42,7 @@ func (c *ChatWSClient) ReadPump() {
 	}
 }
 
+// WritePump 做心跳检测，监听通道，有消息就写回客户端
 func (c *ChatWSClient) WritePump() {
 	ticker := time.NewTicker(pingPeriod)
 	defer func() {
@@ -153,40 +83,7 @@ func (c *ChatWSClient) WritePump() {
 	}
 }
 
-func InitializeChatAI(apiKey string) {
-
-	if apiKey == "" {
-		log.Println("[AI] API Key为空，跳过AI初始化")
-		return
-	}
-
-	ChatAgent = ai.InitializeAgent(apiKey, HandleAIResponse)
-
-	if ChatAgent != nil {
-		log.Println("✅ [AI] 聊天AI功能已启用！")
-	} else {
-		log.Println("⚠️ [AI] 聊天AI功能未启用")
-	}
-}
-
-func (c *ChatWSClient) write(messageType int, data []byte) error {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
-	if c.closed {
-		return fmt.Errorf("connection closed")
-	}
-	return c.conn.WriteMessage(messageType, data)
-}
-
-func (c *ChatWSClient) Close() {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
-	if !c.closed {
-		c.closed = true
-		close(c.send)
-	}
-}
-
+// handleMessage 反序列化然后给根据类型给不同函数处理
 func (c *ChatWSClient) handleMessage(msg []byte) {
 	var wsMsg WSMessage
 	if err := json.Unmarshal(msg, &wsMsg); err != nil {
@@ -209,10 +106,11 @@ func (c *ChatWSClient) handleMessage(msg []byte) {
 	case "ping":
 		c.sendJSON(WSResponse{Type: "pong", Code: 0, Message: "ok"})
 	default:
-		c.sendError(fmt.Sprintf("unknown message type: %s", wsMsg.Type))
+		c.sendError("unknown message type: " + wsMsg.Type)
 	}
 }
 
+// handleChatMessage chat类型的消息处理：储存传来的消息，发送ack,把消息丢给ai
 func (c *ChatWSClient) handleChatMessage(wsMsg *WSMessage) {
 	ctx := context.Background()
 	ctxWithUserID := client.WithUserID(ctx, int64(c.userID))
@@ -247,80 +145,12 @@ func (c *ChatWSClient) handleChatMessage(wsMsg *WSMessage) {
 		Message: "send message success",
 	})
 
-	if peerClient, ok := chatClients.Load(wsMsg.ReceiverID); ok {
-		peerWS := peerClient.(*ChatWSClient)
-		wsMsg.SenderID = c.userID
-		peerWS.sendMessage(wsMsg)
-		log.Printf("[WS] Message from user %d to user %d delivered", c.userID, wsMsg.ReceiverID)
-	} else {
+	wsMsg.SenderID = c.userID
+	if !SendToUser(wsMsg.ReceiverID, wsMsg) {
 		log.Printf("[WS] User %d is offline, message stored in DB", wsMsg.ReceiverID)
 	}
 
-	if ChatAgent != nil {
-		aiMessage := &ai.ChatMessageDTO{
-			SenderID:   c.userID,
-			ReceiverID: wsMsg.ReceiverID,
-			Content:    wsMsg.Content,
-			Timestamp:  time.Now().Unix(),
-			Type:       0,
-			IsAI:       false,
-		}
-		go ChatAgent.OnMessageReceived(aiMessage)
-	}
-}
-
-func (c *ChatWSClient) sendMessage(msg *WSMessage) {
-	msg.Type = "message"
-	// 不再覆盖SenderID，保留在handleChatMessage中已设置的值
-	msg.Timestamp = time.Now().Unix()
-	data, _ := json.Marshal(msg)
-	select {
-	case c.send <- data:
-	default:
-		log.Printf("[WS] Send buffer full for user %d, dropping message", c.userID)
-	}
-}
-
-func (c *ChatWSClient) sendError(errMsg string) {
-	c.sendJSON(WSResponse{Type: "error", Code: -1, Message: errMsg})
-}
-
-func (c *ChatWSClient) sendJSON(resp WSResponse) {
-	data, _ := json.Marshal(resp)
-	select {
-	case c.send <- data:
-	default:
-		log.Printf("[WS] Send buffer full for user %d, dropping response", c.userID)
-	}
-}
-
-func (c *ChatWSClient) pushUnreadMessages() {
-	ctx := context.Background()
-	ctxWithUserID := client.WithUserID(ctx, int64(c.userID))
-
-	req := &socialpb.GetUnreadMessagesRequest{
-		UserId: int64(c.userID),
-	}
-
-	resp, err := client.ChatServiceClient.GetUnreadMessages(ctxWithUserID, req)
-	if err != nil {
-		log.Printf("[WS] User %d get unread messages failed: %v", c.userID, err)
-		return
-	}
-
-	if resp.Code != commonpb.ErrorCode_SUCCESS || resp.Data == nil || len(resp.Data.ChatMessageList) == 0 {
-		log.Printf("[WS] User %d no unread messages", c.userID)
-		return
-	}
-
-	log.Printf("[WS] Pushing %d unread messages to user %d", len(resp.Data.ChatMessageList), c.userID)
-
-	for _, msg := range resp.Data.ChatMessageList {
-		c.sendJSON(WSResponse{
-			Type: "chat",
-			Data: msg,
-		})
-	}
+	ForwardToAI(c.userID, wsMsg.ReceiverID, wsMsg.Content)
 }
 
 func WsHandler(w http.ResponseWriter, r *http.Request) {
@@ -338,7 +168,7 @@ func WsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if _, exists := chatClients.Load(userID); exists {
+	if IsUserOnline(userID) {
 		http.Error(w, `{"type":"error","code":-2,"message":"already connected"}`, http.StatusConflict)
 		return
 	}
@@ -356,75 +186,8 @@ func WsHandler(w http.ResponseWriter, r *http.Request) {
 		lastActive: time.Now(),
 	}
 
-	chatClients.Store(userID, ws)
-	incrementOnline()
-	log.Printf("[WS] User %d connected, online: %d", userID, GetOnlineCount())
+	RegisterClient(userID, ws)
 	go ws.WritePump()
 	go ws.pushUnreadMessages()
 	ws.ReadPump()
-}
-
-func HandleAIResponse(response *ai.AIResponse) {
-
-	if response == nil || response.Content == "" {
-		return
-	}
-
-	ctx := context.Background()
-
-	req := &socialpb.SendMessageRequest{
-		SenderId:   int64(response.SenderID),
-		ReceiverId: int64(response.ReceiverID),
-		Content:    response.Content,
-		Type:       0,
-	}
-
-	resp, err := client.ChatServiceClient.SendMessage(ctx, req)
-	if err != nil {
-		log.Printf("[AI-WS] 存储AI回复失败: %v", err)
-		return
-	}
-
-	if resp.Code != commonpb.ErrorCode_SUCCESS {
-		log.Printf("[AI-WS] 存储AI回复错误: %s", resp.Message)
-		return
-	}
-
-	log.Printf("[AI-WS] AI回复已存储: Sender=%d, Receiver=%d", response.SenderID, response.ReceiverID)
-
-	wsMsg := &WSMessage{
-		Type:       "message",
-		SenderID:   response.SenderID,
-		ReceiverID: response.ReceiverID,
-		Content:    response.Content,
-		Timestamp:  time.Now().Unix(),
-	}
-
-	targets := []uint64{response.ReceiverID}
-	if len(response.Messages) > 0 {
-		originalSender := response.Messages[0].SenderID
-		if originalSender != response.SenderID && originalSender != response.ReceiverID {
-			found := false
-			for _, id := range targets {
-				if id == originalSender {
-					found = true
-					break
-				}
-			}
-			if !found {
-				targets = append(targets, originalSender)
-			}
-		}
-	}
-
-	for _, targetID := range targets {
-		if client, ok := chatClients.Load(targetID); ok {
-			wsClient := client.(*ChatWSClient)
-			wsMsgCopy := *wsMsg
-			wsClient.sendMessage(&wsMsgCopy)
-			log.Printf("[AI-WS] AI回复已推送给用户 %d", targetID)
-		} else {
-			log.Printf("[AI-WS] 用户 %d 离线，消息已存库", targetID)
-		}
-	}
 }
