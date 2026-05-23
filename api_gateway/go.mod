@@ -1,6 +1,6 @@
 module github.com/ZOEKOFK/video_web_v3/api_gateway
 
-go 1.26
+go 1.25.0
 
 require (
 	github.com/ZOEKOFK/video_web_v3/app v0.0.0
