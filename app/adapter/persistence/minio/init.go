@@ -1,3 +1,4 @@
+// Package minio initializes the shared MinIO client.
 package minio
 
 import (

@@ -49,7 +49,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.24'
+          go-version: '1.25'
           cache-dependency-path: api_gateway/go.sum
       - name: Install dependencies
         working-directory: api_gateway
@@ -57,11 +57,11 @@ jobs:
           go mod download
           go mod verify
       - name: Run golangci-lint (api_gateway)
-        uses: golangci/golangci-lint-action@v6
+        uses: golangci/golangci-lint-action@v9
         with:
           version: latest
           working-directory: api_gateway
-          args: --timeout=10m --go=1.23 --disable=typecheck
+          args: --timeout=10m --disable=typecheck
 
   lint-app:
     name: Lint (app)
@@ -72,7 +72,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.24'
+          go-version: '1.25'
           cache-dependency-path: app/go.sum
       - name: Install dependencies
         working-directory: app
@@ -80,8 +80,8 @@ jobs:
           go mod download
           go mod verify
       - name: Run golangci-lint (app)
-        uses: golangci/golangci-lint-action@v6
+        uses: golangci/golangci-lint-action@v9
         with:
           version: latest
           working-directory: app
-          args: --timeout=10m --go=1.23 --disable=typecheck
+          args: --timeout=10m --disable=typecheck

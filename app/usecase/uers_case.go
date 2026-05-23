@@ -50,6 +50,9 @@ func (u *userUsecase) UploadAvatar(request *users.UploadAvatarRequest) (*model.U
 	minioFilePath := "/picture/" + filename
 	SqlFilePath := my_minio.BucketName + "/picture/" + filename
 	oldUser, err := u.repo.GetUserInfoByID(request.UserId)
+	if err != nil {
+		return nil, err
+	}
 	if oldUser.Avatarurl != "" {
 		err = my_minio.Delete(oldUser.Avatarurl)
 		if err != nil {
@@ -100,6 +103,9 @@ func (u *userUsecase) LoginUser(username, password string, remember bool) (*serv
 		return nil, err
 	}
 	user, err := u.repo.GetUserInfoByUserName(username)
+	if err != nil {
+		return nil, err
+	}
 	loginResp, err := u.service.BuildLoginResponse(user, remember)
 	if err != nil {
 		return nil, err

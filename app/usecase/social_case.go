@@ -41,9 +41,8 @@ func (u *socialUsecase) FollowAction(userID, followID uint, status bool) error {
 			return err
 		}
 		return nil
-	} else {
-		return u.repo.Unfollow(userID, followID)
 	}
+	return u.repo.Unfollow(userID, followID)
 }
 
 func (u *socialUsecase) GetFollowList(userID uint, page, pageSize int) ([]*model.Users, error) {

@@ -2,10 +2,11 @@ package redis
 
 import (
 	"context"
+	crand "crypto/rand"
 	"encoding/json"
 	"fmt"
 	"log"
-	"math/rand"
+	"math/big"
 	"time"
 
 	"github.com/redis/go-redis/v9"
@@ -14,10 +15,6 @@ import (
 var Client *redis.Client
 var Ctx = context.Background()
 var isConnected bool
-
-func init() {
-	rand.Seed(time.Now().UnixNano())
-}
 
 func InitRedis() *redis.Client {
 	Client = redis.NewClient(&redis.Options{
@@ -104,8 +101,14 @@ func SetJSONWithJitter(key string, value interface{}, baseExpiration time.Durati
 	}
 	expiration := baseExpiration
 	if jitterRatio > 0 {
-		jitter := int64(float64(baseExpiration.Nanoseconds()) * jitterRatio * rand.Float64())
-		expiration = time.Duration(rand.Int63n(jitter) + baseExpiration.Nanoseconds() - jitter/2)
+		jitter := int64(float64(baseExpiration.Nanoseconds()) * jitterRatio)
+		if jitter > 0 {
+			randomJitter, err := crand.Int(crand.Reader, big.NewInt(jitter))
+			if err != nil {
+				return fmt.Errorf("生成缓存抖动失败: %v", err)
+			}
+			expiration = time.Duration(randomJitter.Int64() + baseExpiration.Nanoseconds() - jitter/2)
+		}
 	}
 	jsonData, err := json.Marshal(value)
 	if err != nil {
@@ -150,8 +153,11 @@ func SetNX(key string, value interface{}, expiration time.Duration) SetNXResult 
 	if !isConnected {
 		return SetNXResult{false, fmt.Errorf("redis not connected")}
 	}
-	success, err := Client.SetNX(Ctx, key, value, expiration).Result()
-	return SetNXResult{success, err}
+	result, err := Client.SetArgs(Ctx, key, value, redis.SetArgs{TTL: expiration, Mode: "NX"}).Result()
+	if err == redis.Nil {
+		return SetNXResult{false, nil}
+	}
+	return SetNXResult{result == "OK", err}
 }
 
 type BloomFilter struct {

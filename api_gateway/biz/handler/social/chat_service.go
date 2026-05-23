@@ -5,10 +5,11 @@ package social
 import (
 	"context"
 
-	"github.com/ZOEKOFK/video_web_v3/app/pb/common"
-	"github.com/ZOEKOFK/video_web_v3/app/pb/social"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
+
+	"github.com/ZOEKOFK/video_web_v3/app/pb/common"
+	"github.com/ZOEKOFK/video_web_v3/app/pb/social"
 )
 
 // SendMessage .

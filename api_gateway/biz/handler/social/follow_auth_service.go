@@ -7,12 +7,13 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/cloudwego/hertz/pkg/protocol/consts"
+
 	"github.com/ZOEKOFK/video_web_v3/api_gateway/client"
 	"github.com/ZOEKOFK/video_web_v3/api_gateway/my_jwt"
 	commonpb "github.com/ZOEKOFK/video_web_v3/app/pb/common"
 	socialpb "github.com/ZOEKOFK/video_web_v3/app/pb/social"
-	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )
 
 // FollowAction .
@@ -25,7 +26,8 @@ func FollowAction(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 	var req socialpb.FollowRequest
-	if err := c.Bind(&req); err != nil {
+	err = c.Bind(&req)
+	if err != nil {
 		log.Printf("参数绑定失败: %v", err)
 		c.JSON(consts.StatusBadRequest, client.FailResponse(err.Error(), commonpb.ErrorCode_PARAM_ERROR))
 		return

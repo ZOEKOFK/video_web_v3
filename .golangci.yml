@@ -1,16 +1,19 @@
+version: "2"
+
 run:
-  timeout: 5m
+  timeout: 10m
   issues-exit-code: 1
   tests: false
   modules-download-mode: readonly
 
-output:
-  formats:
-    - format: colored-line-number
-  print-issued-lines: true
-  sort-results: true
+formatters:
+  settings:
+    goimports:
+      local-prefixes:
+        - github.com/ZOEKOFK/video_web_v3
 
 linters:
+  default: standard
   enable:
     - govet
     - staticcheck
@@ -23,8 +26,6 @@ linters:
     - unconvert
     - unused
     - misspell
-    - gofmt
-    - goimports
     - bodyclose
     - nilerr
     - predeclared
@@ -41,84 +42,78 @@ linters:
     - contextcheck
     - noctx
 
-  fast: false
+  settings:
+    govet:
+      enable-all: true
+      disable:
+        - fieldalignment
+        - nilness
 
-linters-settings:
-  govet:
-    enable-all: true
-    disable:
-      - fieldalignment
-      - nilness
+    gocyclo:
+      min-complexity: 20
 
-  gocyclo:
-    min-complexity: 20
+    funlen:
+      lines: 100
+      statements: 50
 
-  funlen:
-    lines: 100
-    statements: 50
+    gocognit:
+      min-complexity: 25
 
-  gocognit:
-    min-complexity: 25
+    revive:
+      rules:
+        - name: context-as-argument
+        - name: context-keys-type
+        - name: error-return
+        - name: time-equal
+        - name: indent-error-flow
+        - name: error-naming
 
-  revive:
+    gosec:
+      severity: medium
+      confidence: medium
+      excludes:
+        - G204
+        - G307
+        - G115
+
+    misspell:
+      locale: US
+
+  exclusions:
     rules:
-      - name: exported
-      - name: context-as-argument
-      - name: context-keys-type
-      - name: error-return
-      - name: time-equal
-      - name: indent-error-flow
-      - name: error-naming
-      - name: package-comments
+      - path: test_glm\.go$
+        linters:
+          - all
 
-  gosec:
-    severity: medium
-    confidence: medium
-    excludes:
-      - G204
-      - G307
-      - G115
+      - path: _test\.go
+        linters:
+          - gocyclo
+          - funlen
+          - gocognit
+          - gosec
+          - revive
+          - unused
 
-  misspell:
-    locale: US
+      - path: (generated|pb)\.go$
+        linters:
+          - all
 
-  goimports:
-    local-prefixes: github.com/ZOEKOFK/video_web_v3
+      - text: "^func main\\("
+        linters:
+          - funlen
+          - gocognit
+          - gocyclo
+
+      - text: "^func init\\("
+        linters:
+          - gocyclo
+          - funlen
+
+      - path: (chat_hub|chat_types)\.go$
+        linters:
+          - unused
 
 issues:
-  exclude-rules:
-    - path: test_glm\.go$
-      linters:
-        - all
-
-    - path: _test\.go
-      linters:
-        - gocyclo
-        - funlen
-        - gocognit
-        - gosec
-        - revive
-        - unused
-
-    - path: (generated|pb)\.go$
-      linters:
-        - all
-
-    - text: "^func main\\("
-      linters:
-        - funlen
-        - gocognit
-        - gocyclo
-
-    - text: "^func init\\("
-      linters:
-        - gocyclo
-        - funlen
-
-    - path: (chat_hub|chat_types)\.go$
-      linters:
-        - unused
-
   max-issues-per-linter: 50
   max-same-issues: 3
   new: false

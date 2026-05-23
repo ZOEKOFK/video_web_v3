@@ -71,15 +71,15 @@ func (u *interactionUsecase) GetCommentList(videoID uint, page, pageSize int) ([
 		log.Printf("获取评论总数失败: %v", err)
 	}
 	for _, c := range comments {
-		replies, err := u.repo.GetCommentReplies(c.ID)
-		if err != nil {
-			log.Printf("获取评论 %d 的回复失败: %v", c.ID, err)
+		replies, repliesErr := u.repo.GetCommentReplies(c.ID)
+		if repliesErr != nil {
+			log.Printf("获取评论 %d 的回复失败: %v", c.ID, repliesErr)
 			continue
 		}
 		if len(replies) > 0 {
-			repliesWithUsers, err := u.repo.GetCommentsWithUsers(replies)
-			if err != nil {
-				log.Printf("填充回复用户信息失败: %v", err)
+			repliesWithUsers, usersErr := u.repo.GetCommentsWithUsers(replies)
+			if usersErr != nil {
+				log.Printf("填充回复用户信息失败: %v", usersErr)
 				for _, reply := range replies {
 					c.Replies = append(c.Replies, *reply)
 				}

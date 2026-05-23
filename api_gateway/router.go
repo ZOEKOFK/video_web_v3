@@ -5,9 +5,10 @@ package main
 import (
 	"net/http"
 
-	"github.com/ZOEKOFK/video_web_v3/api_gateway/biz/handler/social"
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/cloudwego/hertz/pkg/common/adaptor"
+
+	"github.com/ZOEKOFK/video_web_v3/api_gateway/biz/handler/social"
 )
 
 // customizeRegister registers customize routers.

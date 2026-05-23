@@ -62,8 +62,7 @@ func (u *UsersServiceLogic) CheckRegisterInfo(request *users.UserRegisterRequest
 func (u *UsersServiceLogic) EncryptPassword(password string) (string, error) {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
-		err := errors.New("encrypt password fail:" + err.Error())
-		return "", err
+		return "", errors.New("encrypt password fail:" + err.Error())
 	}
 	return string(hashedPassword), nil
 }

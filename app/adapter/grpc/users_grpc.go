@@ -87,7 +87,7 @@ func (s *UsersGrpc) RefreshSession(ctx context.Context, in *users.RefreshTokenRe
 func (s *UsersGrpc) Logout(ctx context.Context, in *users.RefreshTokenRequest) (*common.CommonResponse, error) {
 	err := s.userUsecase.Logout(in.RefreshToken)
 	if err != nil {
-
+		return FailResponse("Logout", common.ErrorCode_PROGRESS_ERROR, err), nil
 	}
 	return SuccessResponse("Logout", nil), nil
 }

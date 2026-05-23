@@ -7,7 +7,7 @@ import (
 	"sync"
 
 	"github.com/ZOEKOFK/video_web_v3/app/adapter/consul"
-	"github.com/ZOEKOFK/video_web_v3/app/adapter/grpc"
+	appgrpc "github.com/ZOEKOFK/video_web_v3/app/adapter/grpc"
 	"github.com/ZOEKOFK/video_web_v3/app/adapter/persistence/mysql"
 	"github.com/ZOEKOFK/video_web_v3/app/adapter/persistence/redis"
 	"github.com/ZOEKOFK/video_web_v3/app/domain/service_logic"
@@ -17,7 +17,7 @@ import (
 	"github.com/ZOEKOFK/video_web_v3/app/pb/videos"
 	"github.com/ZOEKOFK/video_web_v3/app/usecase"
 
-	orgin "google.golang.org/grpc"
+	grpc "google.golang.org/grpc"
 	"google.golang.org/grpc/health"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 )
@@ -30,8 +30,8 @@ func main() {
 	if err != nil {
 		log.Printf("⚠️ 无法连接 Consul: %v，将以单机模式运行", err)
 	} else {
-		if err := consulClient.Ping(); err != nil {
-			log.Printf("⚠️ Consul 健康检查失败: %v", err)
+		if pingErr := consulClient.Ping(); pingErr != nil {
+			log.Printf("⚠️ Consul 健康检查失败: %v", pingErr)
 		} else {
 			log.Println("✅ 已连接到 Consul")
 		}
@@ -41,7 +41,7 @@ func main() {
 
 	db, err := mysql.InitDB()
 	if err != nil {
-		log.Printf(err.Error())
+		log.Printf("%v", err)
 		panic(err)
 	}
 	defer db.Close()
@@ -93,12 +93,12 @@ func main() {
 }
 
 func startUserService(userUseCase usecase.UserUseCase) {
-	server := orgin.NewServer(
-		orgin.MaxRecvMsgSize(500*1024*1024),
-		orgin.MaxSendMsgSize(500*1024*1024),
+	server := grpc.NewServer(
+		grpc.MaxRecvMsgSize(500*1024*1024),
+		grpc.MaxSendMsgSize(500*1024*1024),
 	)
 	//grpc register
-	usersGrpc := grpc.NewUsersGrpc(userUseCase)
+	usersGrpc := appgrpc.NewUsersGrpc(userUseCase)
 	users.RegisterUserAuthServiceServer(server, usersGrpc)
 	users.RegisterUserPublicServiceServer(server, usersGrpc)
 	users.RegisterSessionServiceServer(server, usersGrpc)
@@ -127,11 +127,11 @@ func startUserService(userUseCase usecase.UserUseCase) {
 }
 
 func startInteractionService(interactionUseCase usecase.InteractionUseCase) {
-	server := orgin.NewServer(
-		orgin.MaxRecvMsgSize(500*1024*1024),
-		orgin.MaxSendMsgSize(500*1024*1024),
+	server := grpc.NewServer(
+		grpc.MaxRecvMsgSize(500*1024*1024),
+		grpc.MaxSendMsgSize(500*1024*1024),
 	)
-	interactionGrpc := grpc.NewInteractionGrpc(interactionUseCase)
+	interactionGrpc := appgrpc.NewInteractionGrpc(interactionUseCase)
 	interaction.RegisterCommentAuthServiceServer(server, interactionGrpc)
 	interaction.RegisterCommentPublicServiceServer(server, interactionGrpc)
 	interaction.RegisterLikeAuthServiceServer(server, interactionGrpc)
@@ -159,12 +159,12 @@ func startInteractionService(interactionUseCase usecase.InteractionUseCase) {
 }
 
 func startVideoService(videoUseCase usecase.VideoUseCase) {
-	server := orgin.NewServer(
-		orgin.MaxRecvMsgSize(500*1024*1024),
-		orgin.MaxSendMsgSize(500*1024*1024),
+	server := grpc.NewServer(
+		grpc.MaxRecvMsgSize(500*1024*1024),
+		grpc.MaxSendMsgSize(500*1024*1024),
 	)
 
-	videosGrpc := grpc.NewVideosGrpc(videoUseCase)
+	videosGrpc := appgrpc.NewVideosGrpc(videoUseCase)
 	videos.RegisterVideoAuthServiceServer(server, videosGrpc)
 	videos.RegisterVideoPublicServiceServer(server, videosGrpc)
 
@@ -190,13 +190,13 @@ func startVideoService(videoUseCase usecase.VideoUseCase) {
 }
 
 func startSocialService(socialUseCase usecase.SocialUseCase, chatUseCase usecase.ChatUseCase) {
-	server := orgin.NewServer(
-		orgin.MaxRecvMsgSize(500*1024*1024),
-		orgin.MaxSendMsgSize(500*1024*1024),
+	server := grpc.NewServer(
+		grpc.MaxRecvMsgSize(500*1024*1024),
+		grpc.MaxSendMsgSize(500*1024*1024),
 	)
 
-	socialGrpc := grpc.NewSocialGrpc(socialUseCase)
-	chatGrpc := grpc.NewChatGrpc(chatUseCase)
+	socialGrpc := appgrpc.NewSocialGrpc(socialUseCase)
+	chatGrpc := appgrpc.NewChatGrpc(chatUseCase)
 	socialpb.RegisterFollowAuthServiceServer(server, socialGrpc)
 	socialpb.RegisterFollowPublicServiceServer(server, socialGrpc)
 	socialpb.RegisterChatServiceServer(server, chatGrpc)

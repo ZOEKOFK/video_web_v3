@@ -1,3 +1,4 @@
+// Package consul provides Consul service registration utilities.
 package consul
 
 import (
@@ -71,7 +72,7 @@ func (c *ConsulClient) RegisterService(serviceName, host string, port int, tags 
 	return serviceID, nil
 }
 
-func (c *ConsulClient) SafeRegister(serviceName string, host string, port int, tags []string) {
+func (c *ConsulClient) SafeRegister(serviceName, host string, port int, tags []string) {
 	if c == nil || c.client == nil {
 		return
 	}

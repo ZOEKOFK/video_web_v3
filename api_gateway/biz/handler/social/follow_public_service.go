@@ -8,11 +8,12 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/cloudwego/hertz/pkg/protocol/consts"
+
 	"github.com/ZOEKOFK/video_web_v3/api_gateway/client"
 	commonpb "github.com/ZOEKOFK/video_web_v3/app/pb/common"
 	socialpb "github.com/ZOEKOFK/video_web_v3/app/pb/social"
-	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )
 
 // GetFollowList .
@@ -26,7 +27,8 @@ func GetFollowList(ctx context.Context, c *app.RequestContext) {
 	}
 
 	var req socialpb.FollowListRequest
-	if err := c.BindAndValidate(&req); err != nil {
+	err = c.BindAndValidate(&req)
+	if err != nil {
 		log.Printf("[GetFollowList] 参数绑定失败: %v", err)
 		c.JSON(consts.StatusBadRequest, client.FailResponse(err.Error(), commonpb.ErrorCode_PARAM_ERROR))
 		return
@@ -56,7 +58,8 @@ func GetFollowerList(ctx context.Context, c *app.RequestContext) {
 	}
 
 	var req socialpb.FollowerListRequest
-	if err := c.BindAndValidate(&req); err != nil {
+	err = c.BindAndValidate(&req)
+	if err != nil {
 		log.Printf("[GetFollowerList] 参数绑定失败: %v", err)
 		c.JSON(consts.StatusBadRequest, client.FailResponse(err.Error(), commonpb.ErrorCode_PARAM_ERROR))
 		return

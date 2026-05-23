@@ -1,8 +1,7 @@
+// Package model defines persistence models used by the app domain.
 package model
 
-import (
-	"github.com/jinzhu/gorm"
-)
+import "github.com/jinzhu/gorm"
 
 type Comment struct {
 	gorm.Model

@@ -1,8 +1,6 @@
 package model
 
-import (
-	"github.com/ZOEKOFK/video_web_v3/app/pb/common"
-)
+import "github.com/ZOEKOFK/video_web_v3/app/pb/common"
 
 func UserToPb(user *Users) *common.User {
 	if user == nil {

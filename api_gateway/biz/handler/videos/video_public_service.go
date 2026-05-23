@@ -7,11 +7,12 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/cloudwego/hertz/pkg/protocol/consts"
+
 	"github.com/ZOEKOFK/video_web_v3/api_gateway/client"
 	commonpb "github.com/ZOEKOFK/video_web_v3/app/pb/common"
 	videospb "github.com/ZOEKOFK/video_web_v3/app/pb/videos"
-	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )
 
 // SearchVideos .
@@ -65,6 +66,10 @@ func GetUserVideos(ctx context.Context, c *app.RequestContext) {
 	}
 	req.Id, _ = strconv.ParseUint(id, 10, 64)
 	resp, err := client.VideoPublicServiceClient.GetUserVideos(ctx, &req)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, resp)
+		return
+	}
 	c.JSON(consts.StatusOK, resp)
 }
 
@@ -79,5 +84,9 @@ func GetVideoFeed(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 	resp, err := client.VideoPublicServiceClient.GetVideoFeed(ctx, &req)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, resp)
+		return
+	}
 	c.JSON(consts.StatusOK, resp)
 }

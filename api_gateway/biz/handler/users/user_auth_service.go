@@ -10,12 +10,13 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/cloudwego/hertz/pkg/protocol/consts"
+
 	"github.com/ZOEKOFK/video_web_v3/api_gateway/client"
 	"github.com/ZOEKOFK/video_web_v3/api_gateway/my_jwt"
 	commonpb "github.com/ZOEKOFK/video_web_v3/app/pb/common"
 	userspb "github.com/ZOEKOFK/video_web_v3/app/pb/users"
-	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )
 
 // GetUserInfo .
@@ -76,6 +77,11 @@ func UploadAvatar(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 	fileBytes, err := io.ReadAll(file)
+	if err != nil {
+		log.Println("read file err:", err)
+		c.JSON(consts.StatusInternalServerError, client.FailResponse(err.Error(), commonpb.ErrorCode_PROGRESS_ERROR))
+		return
+	}
 	req := &userspb.UploadAvatarRequest{
 		UserId:        id,
 		File:          fileBytes,
@@ -133,7 +139,8 @@ func BindMFA(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 	var req userspb.BindMFARequest
-	if err := c.Bind(&req); err != nil {
+	err = c.Bind(&req)
+	if err != nil {
 		log.Printf("[BindMFA] 参数绑定失败: %v", err)
 		c.JSON(consts.StatusBadRequest, client.FailResponse(err.Error(), commonpb.ErrorCode_PARAM_ERROR))
 		return
