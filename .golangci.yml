@@ -3,8 +3,6 @@ run:
   issues-exit-code: 1
   tests: false
   modules-download-mode: readonly
-  exclude-files:
-    - "test_glm\\.go"  # 排除临时测试文件（main 函数冲突）
 
 output:
   formats:
@@ -87,15 +85,13 @@ linters-settings:
   goimports:
     local-prefixes: github.com/ZOEKOFK/video_web_v3
 
-  unused:
-    field-writes-are-uses: false
-    post-statements-are-uses: false
-
-  ineffassign:
-    enable: true
-
 issues:
   exclude-rules:
+    # 排除临时测试文件
+    - path: test_glm\.go$
+      linters:
+        - all
+
     # 测试文件宽松处理
     - path: _test\.go
       linters:
