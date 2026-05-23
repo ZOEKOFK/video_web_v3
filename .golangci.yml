@@ -3,8 +3,6 @@ run:
   issues-exit-code: 1
   tests: false
   modules-download-mode: readonly
-  exclude-files:
-    - "test_glm\\.go"  # 排除临时测试文件（main 函数冲突）
 
 output:
   formats:
@@ -36,12 +34,12 @@ linters:
     - wastedassign
 
   disable:
-    - errcheck               # 未检查错误：大部分场景可忽略（WS写操作、deadline等）
+    - errcheck
     - exhaustive
     - wrapcheck
-    - prealloc              # 性能优化建议，非必须
-    - contextcheck          # WebSocket场景特殊处理
-    - noctx                 # 同上
+    - prealloc
+    - contextcheck
+    - noctx
 
   fast: false
 
@@ -50,17 +48,17 @@ linters-settings:
     enable-all: true
     disable:
       - fieldalignment
-      - nilness              # 误报：if err != nil 块内调用 err.Error() 是安全的
+      - nilness
 
   gocyclo:
-    min-complexity: 20      # 放宽：从15→20
+    min-complexity: 20
 
   funlen:
-    lines: 100              # 放宽：从80→100
-    statements: 50          # 放宽：从40→50
+    lines: 100
+    statements: 50
 
   gocognit:
-    min-complexity: 25      # 放宽：从20→25
+    min-complexity: 25
 
   revive:
     rules:
@@ -77,9 +75,9 @@ linters-settings:
     severity: medium
     confidence: medium
     excludes:
-      - G204                # 命令执行审计
-      - G307               # defer unsafe
-      - G115                # 整数溢出转换（ID范围已知安全）
+      - G204
+      - G307
+      - G115
 
   misspell:
     locale: US
@@ -87,16 +85,12 @@ linters-settings:
   goimports:
     local-prefixes: github.com/ZOEKOFK/video_web_v3
 
-  unused:
-    field-writes-are-uses: false
-    post-statements-are-uses: false
-
-  ineffassign:
-    enable: true
-
 issues:
   exclude-rules:
-    # 测试文件宽松处理
+    - path: test_glm\.go$
+      linters:
+        - all
+
     - path: _test\.go
       linters:
         - gocyclo
@@ -106,12 +100,10 @@ issues:
         - revive
         - unused
 
-    # 生成的代码不检查
     - path: (generated|pb)\.go$
       linters:
         - all
 
-    # main/init 函数允许较长/复杂
     - text: "^func main\\("
       linters:
         - funlen
@@ -123,7 +115,6 @@ issues:
         - gocyclo
         - funlen
 
-    # 允许未使用的函数/字段（保留用于未来功能）
     - path: (chat_hub|chat_types)\.go$
       linters:
         - unused
