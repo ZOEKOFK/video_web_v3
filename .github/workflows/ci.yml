@@ -9,9 +9,6 @@ on:
 permissions:
   contents: read
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
 jobs:
   codeql-analysis:
     name: CodeQL Analysis
@@ -25,9 +22,6 @@ jobs:
       fail-fast: false
       matrix:
         language: [ 'go' ]
-        include:
-          - language: go
-            working-directory: ./app
 
     steps:
     - name: Checkout repository
@@ -41,7 +35,7 @@ jobs:
     - name: Autobuild
       uses: github/codeql-action/autobuild@v4
       with:
-        working-directory: ${{ matrix.working-directory }}
+        working-directory: ./app
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v4
@@ -59,16 +53,14 @@ jobs:
       uses: actions/setup-go@v5
       with:
         go-version: '1.26'
-
-    - name: Download dependencies (api_gateway)
-      run: cd api_gateway && go mod download
+        cache-dependency-path: api_gateway/go.sum
 
     - name: Run golangci-lint (api_gateway)
       uses: golangci/golangci-lint-action@v6
       with:
         version: latest
         working-directory: api_gateway
-        args: --timeout=5m
+        args: --timeout=5m --enable=goimports,govet,staticcheck
 
   lint-app:
     name: Lint (app)
@@ -81,13 +73,11 @@ jobs:
       uses: actions/setup-go@v5
       with:
         go-version: '1.26'
-
-    - name: Download dependencies (app)
-      run: cd app && go mod download
+        cache-dependency-path: app/go.sum
 
     - name: Run golangci-lint (app)
       uses: golangci/golangci-lint-action@v6
       with:
         version: latest
         working-directory: app
-        args: --timeout=5m
+        args: --timeout=5m --enable=goimports,govet,staticcheck
