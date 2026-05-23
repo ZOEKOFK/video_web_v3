@@ -61,7 +61,7 @@ jobs:
         with:
           version: latest
           working-directory: api_gateway
-          args: --timeout=10m --disable=typecheck
+          args: --timeout=10m 
 
   lint-app:
     name: Lint (app)
