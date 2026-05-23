@@ -84,4 +84,4 @@ jobs:
         with:
           version: latest
           working-directory: app
-          args: --timeout=10m --disable=typecheck
+          args: --timeout=10m 
