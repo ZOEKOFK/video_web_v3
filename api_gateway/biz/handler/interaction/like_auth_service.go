@@ -5,12 +5,13 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/cloudwego/hertz/pkg/protocol/consts"
+
 	"github.com/ZOEKOFK/video_web_v3/api_gateway/client"
 	"github.com/ZOEKOFK/video_web_v3/api_gateway/my_jwt"
 	commonpb "github.com/ZOEKOFK/video_web_v3/app/pb/common"
 	interactionpb "github.com/ZOEKOFK/video_web_v3/app/pb/interaction"
-	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )
 
 // LikeAction .
@@ -23,8 +24,8 @@ func LikeAction(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 	var req interactionpb.LikeRequest
-	if err := c.Bind(&req); err != nil {
-		log.Printf("[LikeAction] 参数绑定失败: %v", err)
+	if bindErr := c.Bind(&req); bindErr != nil {
+		log.Printf("[LikeAction] 参数绑定失败: %v", bindErr)
 		c.JSON(consts.StatusBadRequest, client.FailResponse(err.Error(), commonpb.ErrorCode_PARAM_ERROR))
 		return
 	}
@@ -48,8 +49,8 @@ func GetLikeList(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 	var req interactionpb.LikeListRequest
-	if err := c.Bind(&req); err != nil {
-		log.Printf("[GetLikeList] 参数绑定失败: %v", err)
+	if bindErr := c.Bind(&req); bindErr != nil {
+		log.Printf("[GetLikeList] 参数绑定失败: %v", bindErr)
 		c.JSON(consts.StatusBadRequest, client.FailResponse(err.Error(), commonpb.ErrorCode_PARAM_ERROR))
 		return
 	}

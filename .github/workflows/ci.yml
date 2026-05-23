@@ -1,0 +1,84 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, feat/agent ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+
+jobs:
+  codeql-analysis:
+    name: CodeQL Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'go' ]
+        include:
+          - language: go
+            build-path: ./app
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v3
+      with:
+        languages: ${{ matrix.language }}
+
+    - name: Autobuild
+      uses: github/codeql-action/autobuild@v3
+      with:
+        build-path: ${{ matrix.build-path }}
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v3
+      with:
+        category: "/language:${{matrix.language}}"
+
+  lint-api-gateway:
+    name: Lint (api_gateway)
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.26'
+
+    - name: Run golangci-lint (api_gateway)
+      uses: golangci/golangci-lint-action@v6
+      with:
+        version: latest
+        working-directory: api_gateway
+        args: --timeout=5m
+
+  lint-app:
+    name: Lint (app)
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.26'
+
+    - name: Run golangci-lint (app)
+      uses: golangci/golangci-lint-action@v6
+      with:
+        version: latest
+        working-directory: app
+        args: --timeout=5m

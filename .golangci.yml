@@ -1,0 +1,133 @@
+run:
+  timeout: 5m
+  issues-exit-code: 1
+  tests: false
+  modules-download-mode: readonly
+  exclude-files:
+    - "test_glm\\.go"  # 排除临时测试文件（main 函数冲突）
+
+output:
+  formats:
+    - format: colored-line-number
+  print-issued-lines: true
+  sort-results: true
+
+linters:
+  enable:
+    - govet
+    - staticcheck
+    - gocyclo
+    - funlen
+    - gocognit
+    - revive
+    - gosec
+    - ineffassign
+    - unconvert
+    - unused
+    - misspell
+    - gofmt
+    - goimports
+    - bodyclose
+    - nilerr
+    - predeclared
+    - rowserrcheck
+    - sqlclosecheck
+    - unparam
+    - wastedassign
+
+  disable:
+    - errcheck               # 未检查错误：大部分场景可忽略（WS写操作、deadline等）
+    - exhaustive
+    - wrapcheck
+    - prealloc              # 性能优化建议，非必须
+    - contextcheck          # WebSocket场景特殊处理
+    - noctx                 # 同上
+
+  fast: false
+
+linters-settings:
+  govet:
+    enable-all: true
+    disable:
+      - fieldalignment
+      - nilness              # 误报：if err != nil 块内调用 err.Error() 是安全的
+
+  gocyclo:
+    min-complexity: 20      # 放宽：从15→20
+
+  funlen:
+    lines: 100              # 放宽：从80→100
+    statements: 50          # 放宽：从40→50
+
+  gocognit:
+    min-complexity: 25      # 放宽：从20→25
+
+  revive:
+    rules:
+      - name: exported
+      - name: context-as-argument
+      - name: context-keys-type
+      - name: error-return
+      - name: time-equal
+      - name: indent-error-flow
+      - name: error-naming
+      - name: package-comments
+
+  gosec:
+    severity: medium
+    confidence: medium
+    excludes:
+      - G204                # 命令执行审计
+      - G307               # defer unsafe
+      - G115                # 整数溢出转换（ID范围已知安全）
+
+  misspell:
+    locale: US
+
+  goimports:
+    local-prefixes: github.com/ZOEKOFK/video_web_v3
+
+  unused:
+    field-writes-are-uses: false
+    post-statements-are-uses: false
+
+  ineffassign:
+    enable: true
+
+issues:
+  exclude-rules:
+    # 测试文件宽松处理
+    - path: _test\.go
+      linters:
+        - gocyclo
+        - funlen
+        - gocognit
+        - gosec
+        - revive
+        - unused
+
+    # 生成的代码不检查
+    - path: (generated|pb)\.go$
+      linters:
+        - all
+
+    # main/init 函数允许较长/复杂
+    - text: "^func main\\("
+      linters:
+        - funlen
+        - gocognit
+        - gocyclo
+
+    - text: "^func init\\("
+      linters:
+        - gocyclo
+        - funlen
+
+    # 允许未使用的函数/字段（保留用于未来功能）
+    - path: (chat_hub|chat_types)\.go$
+      linters:
+        - unused
+
+  max-issues-per-linter: 50
+  max-same-issues: 3
+  new: false

@@ -3,12 +3,13 @@ package main
 import (
 	"log"
 
+	"github.com/cloudwego/hertz/pkg/app/server"
+
 	"github.com/ZOEKOFK/video_web_v3/api_gateway/biz/handler/social"
 	"github.com/ZOEKOFK/video_web_v3/api_gateway/biz/router"
 	"github.com/ZOEKOFK/video_web_v3/api_gateway/client"
 	"github.com/ZOEKOFK/video_web_v3/api_gateway/my_jwt"
 	"github.com/ZOEKOFK/video_web_v3/app/adapter/ai"
-	"github.com/cloudwego/hertz/pkg/app/server"
 )
 
 func main() {

@@ -1,8 +1,9 @@
 package interaction
 
 import (
-	"github.com/ZOEKOFK/video_web_v3/api_gateway/my_jwt"
 	"github.com/cloudwego/hertz/pkg/app"
+
+	"github.com/ZOEKOFK/video_web_v3/api_gateway/my_jwt"
 )
 
 func rootMw() []app.HandlerFunc {

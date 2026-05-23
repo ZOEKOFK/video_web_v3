@@ -7,11 +7,12 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/gorilla/websocket"
+
 	"github.com/ZOEKOFK/video_web_v3/api_gateway/client"
 	"github.com/ZOEKOFK/video_web_v3/api_gateway/my_jwt"
 	commonpb "github.com/ZOEKOFK/video_web_v3/app/pb/common"
 	socialpb "github.com/ZOEKOFK/video_web_v3/app/pb/social"
-	"github.com/gorilla/websocket"
 )
 
 // ReadPump 从客户端读入消息，配置连接参数，持续接收消息

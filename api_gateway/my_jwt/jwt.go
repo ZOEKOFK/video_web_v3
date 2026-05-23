@@ -6,10 +6,11 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/ZOEKOFK/video_web_v3/api_gateway/client"
-	"github.com/ZOEKOFK/video_web_v3/app/pb/common"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/hertz-contrib/jwt"
+
+	"github.com/ZOEKOFK/video_web_v3/api_gateway/client"
+	"github.com/ZOEKOFK/video_web_v3/app/pb/common"
 )
 
 var (
