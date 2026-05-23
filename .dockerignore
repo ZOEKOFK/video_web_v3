@@ -1,0 +1,75 @@
+# Git history (large, not needed in image)
+.git/
+.gitignore
+
+# IDE & Editor config
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Documentation (not needed at runtime)
+docs/
+*.md
+!README.md
+
+# Build artifacts (rebuild in container)
+bin/
+dist/
+build/
+*.exe
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Go specific
+go.work
+vendor/
+
+# Hertz cache
+.hz/
+
+# Environment & Secrets (security critical!)
+.env*
+!.env.example
+*.pem
+*.key
+
+# Debug artifacts
+debug-*.md
+.dbg/
+*.ndjson
+*.log
+nohup.out
+
+# Test coverage
+coverage.html
+coverage.out
+profile.out
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Temp files
+*.tmp
+*.temp
+*.bak
+*.txt
+!README.txt
+
+# Docker itself (prevent recursive build)
+docker-compose*.yml
+Dockerfile*
+
+# Node (if any frontend)
+node_modules/

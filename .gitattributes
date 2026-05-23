@@ -1,0 +1,43 @@
+# === Text files: force LF (Unix line endings) ===
+*.go text eol=lf
+*.proto text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.json text eol=lf
+*.toml text eol=lf
+*.ini text eol=lf
+*.sql text eol=lf
+*.mod text eol=lf
+*.sum text eol=lf
+*.md text eol=lf
+Makefile text eol=lf
+Dockerfile* text eol=lf
+.gitignore text eol=lf
+.dockerignore text eol=lf
+.editorconfig text eol=lf
+
+# === Binary files: no conversion ===
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+*.pdf binary
+*.zip binary
+*.tar.gz binary
+*.rar binary
+*.7z binary
+
+# === Lock files: diff is meaningless ===
+go.sum text -diff
+package-lock.json text -diff
+
+# === Sensitive files: never show diff content ===
+*.key binary
+*.pem binary
+.env* -diff -merge

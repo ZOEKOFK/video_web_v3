@@ -11,8 +11,8 @@
 # Go workspace
 go.work
 
-# Go vendor
-vendor/
+# === Hertz / IDL ===
+.hz/
 
 # IDE
 .idea/
@@ -20,23 +20,44 @@ vendor/
 *.swp
 *.swo
 *~
+.project
+.classpath
+.settings/
 
 # OS
 .DS_Store
 Thumbs.db
+Desktop.ini
 
-# Build output
-/bin/
-/dist/
-/build/
-
-# Logs
+# === Logs & Debug ===
 *.log
+*.ndjson
+nohup.out
+debug-*.md
+.dbg/
 
-# Environment
+# === Environment & Secrets ===
 .env
-.env.local
+.env.*
+!.env.example
+*.pem
+*.key
 
-# Database
+# === Database ===
 *.db
 *.sqlite
+*.sqlite3
+
+# === Temp Files ===
+*.tmp
+*.temp
+*.bak
+*.txt
+!README.txt
+!LICENSE.txt
+!CHANGELOG.txt
+
+# === Test Coverage ===
+coverage.html
+coverage.out
+profile.out
