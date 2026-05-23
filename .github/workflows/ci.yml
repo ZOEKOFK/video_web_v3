@@ -43,47 +43,45 @@ jobs:
   lint-api-gateway:
     name: Lint (api_gateway)
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: api_gateway
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.26'
+          go-version: '1.23'
           cache-dependency-path: api_gateway/go.sum
       - name: Install dependencies
+        working-directory: api_gateway
         run: |
           go mod download
           go mod verify
       - name: Run golangci-lint (api_gateway)
         uses: golangci/golangci-lint-action@v6
         with:
-          version: v1.62.0
+          version: latest
+          working-directory: api_gateway
           args: --timeout=10m
 
   lint-app:
     name: Lint (app)
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: app
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.26'
+          go-version: '1.23'
           cache-dependency-path: app/go.sum
       - name: Install dependencies
+        working-directory: app
         run: |
           go mod download
           go mod verify
       - name: Run golangci-lint (app)
         uses: golangci/golangci-lint-action@v6
         with:
-          version: v1.62.0
+          version: latest
+          working-directory: app
           args: --timeout=10m
