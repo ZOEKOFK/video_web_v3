@@ -49,7 +49,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.26'
+          go-version: '1.23'
           cache-dependency-path: api_gateway/go.sum
       - name: Install dependencies
         working-directory: api_gateway
@@ -59,7 +59,7 @@ jobs:
       - name: Run golangci-lint (api_gateway)
         uses: golangci/golangci-lint-action@v6
         with:
-          version: v1.62.0
+          version: latest
           working-directory: api_gateway
           args: --timeout=10m
 
@@ -72,7 +72,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.26'
+          go-version: '1.23'
           cache-dependency-path: app/go.sum
       - name: Install dependencies
         working-directory: app
@@ -82,6 +82,6 @@ jobs:
       - name: Run golangci-lint (app)
         uses: golangci/golangci-lint-action@v6
         with:
-          version: v1.62.0
+          version: latest
           working-directory: app
           args: --timeout=10m
