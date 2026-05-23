@@ -1,129 +1,89 @@
-run:
-  timeout: 5m
-  issues-exit-code: 1
-  tests: false
-  modules-download-mode: readonly
+name: CI
 
-output:
-  formats:
-    - format: colored-line-number
-  print-issued-lines: true
-  sort-results: true
+on:
+  push:
+    branches: [ main, feat/agent ]
+  pull_request:
+    branches: [ main ]
 
-linters:
-  enable:
-    - govet
-    - staticcheck
-    - gocyclo
-    - funlen
-    - gocognit
-    - revive
-    - gosec
-    - ineffassign
-    - unconvert
-    - unused
-    - misspell
-    - gofmt
-    - goimports
-    - bodyclose
-    - nilerr
-    - predeclared
-    - rowserrcheck
-    - sqlclosecheck
-    - unparam
-    - wastedassign
+permissions:
+  contents: read
 
-  disable:
-    - errcheck               # 未检查错误：大部分场景可忽略（WS写操作、deadline等）
-    - exhaustive
-    - wrapcheck
-    - prealloc              # 性能优化建议，非必须
-    - contextcheck          # WebSocket场景特殊处理
-    - noctx                 # 同上
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
-  fast: false
+jobs:
+  codeql-analysis:
+    name: CodeQL Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'go' ]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: ${{ matrix.language }}
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v4
+        with:
+          working-directory: ./app
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: "/language:${{matrix.language}}"
 
-linters-settings:
-  govet:
-    enable-all: true
-    disable:
-      - fieldalignment
-      - nilness              # 误报：if err != nil 块内调用 err.Error() 是安全的
+  lint-api-gateway:
+    name: Lint (api_gateway)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: api_gateway
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.26'
+          cache-dependency-path: api_gateway/go.sum
+      - name: Install dependencies
+        run: |
+          go mod download
+          go mod verify
+      - name: Run golangci-lint (api_gateway)
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: v1.62.0
+          args: --timeout=10m
 
-  gocyclo:
-    min-complexity: 20      # 放宽：从15→20
-
-  funlen:
-    lines: 100              # 放宽：从80→100
-    statements: 50          # 放宽：从40→50
-
-  gocognit:
-    min-complexity: 25      # 放宽：从20→25
-
-  revive:
-    rules:
-      - name: exported
-      - name: context-as-argument
-      - name: context-keys-type
-      - name: error-return
-      - name: time-equal
-      - name: indent-error-flow
-      - name: error-naming
-      - name: package-comments
-
-  gosec:
-    severity: medium
-    confidence: medium
-    excludes:
-      - G204                # 命令执行审计
-      - G307               # defer unsafe
-      - G115                # 整数溢出转换（ID范围已知安全）
-
-  misspell:
-    locale: US
-
-  goimports:
-    local-prefixes: github.com/ZOEKOFK/video_web_v3
-
-issues:
-  exclude-rules:
-    # 排除临时测试文件
-    - path: test_glm\.go$
-      linters:
-        - all
-
-    # 测试文件宽松处理
-    - path: _test\.go
-      linters:
-        - gocyclo
-        - funlen
-        - gocognit
-        - gosec
-        - revive
-        - unused
-
-    # 生成的代码不检查
-    - path: (generated|pb)\.go$
-      linters:
-        - all
-
-    # main/init 函数允许较长/复杂
-    - text: "^func main\\("
-      linters:
-        - funlen
-        - gocognit
-        - gocyclo
-
-    - text: "^func init\\("
-      linters:
-        - gocyclo
-        - funlen
-
-    # 允许未使用的函数/字段（保留用于未来功能）
-    - path: (chat_hub|chat_types)\.go$
-      linters:
-        - unused
-
-  max-issues-per-linter: 50
-  max-same-issues: 3
-  new: false
+  lint-app:
+    name: Lint (app)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.26'
+          cache-dependency-path: app/go.sum
+      - name: Install dependencies
+        run: |
+          go mod download
+          go mod verify
+      - name: Run golangci-lint (app)
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: v1.62.0
+          args: --timeout=10m
